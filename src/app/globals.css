@@ -2,26 +2,580 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  position: relative;
+  z-index: 100;
+  user-select: none;
+}
+.colorRed{
+  color: red;
+  position: absolute;
+  bottom: -35px;
+  font-size: 14px;
+}
+header{
+  width: 100%;
+  height: 8vh;
+  background-color: #000;
+  color: #fff;
+  opacity: 0.8;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+header nav{
+  width: 100%;
+  height: 100%;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+header nav ul{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 20px;
+}
+
+header nav ul li{
+  list-style: none;
+  text-decoration: none;
+  width: 100px;
+  height: 100%;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+header nav ul li a{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+header nav ul li a:hover{
+  background-color: #111;
+}
+
+main{
+  height: 92vh;
+}
+
+body{
+  background-image: url('../../public/chessMain.jpg');
+    background-repeat: no-repeat;
+    background-position: 0;
+    background-size: cover;
+    height: 100vh;
+}
+
+main div{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #fff;
+}
+
+main div h1{
+  font-size: 28px;
+  font-weight: 100;
+}
+
+main div h3{
+  font-weight: 100;
+}
+
+.mainEmpezar{
+  color: #fff;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  width: 160px;
+  border-radius: 30px;
+  transition: all 0.3s;
+  margin-top: 20px;
+}
+
+.mainEmpezar:hover{
+  transform: scale(0.95);
+  background-color: rgba(156, 114, 36, 0.6);
+}
+
+/* TOURNAMENTS */
+
+.tournaments{
+  width: 100%;
+  height: 92%;
+  display: flex;
+}
+
+.tournamentsContainer{
+  height: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  max-width: 23%;
+}
+
+.tournamentFlex{
+  display: flex;
+  justify-content: space-between;
+  align-items: space-between;
+  width: 100%;
+  height: 130px;
+}
+
+.startTournament{
+  background-color: rgba(156, 114, 36, 0.6);
+  color: #fff;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70% !important;
+}
+
+.startTournament:hover{
+  background-color:rgba(156, 114, 36, 0.5);
+  transform: scale(0.95);
+}
+
+.createTournament{
+  display: flex;
+  flex-direction: column;
+  align-items: space-between;
+  height: 130px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.createTournament h4{
+  color: #fff;
+  width: 100%;
+}
+
+.createTournament input{
+  height: 40px;
+  padding: 5px;
+  width: 100%;
+}
+
+.createTournament input:focus{
+  outline: none ;
+  box-shadow: none;
+  border: 1px solid rgb(248, 170, 26); /* Puedes ajustar el color y el ancho según tus preferencias */
+  border-radius: 5px; 
+}
+
+.createTournament button{
+  color: #fff;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.createTournament button:hover{
+  background-color: rgba(156, 114, 36, 0.6);
+}
+
+.tournamentResults{
+  width: 100%;
+  color: #fff;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  height: 60vh;
+  margin-top: 50px
+}
+
+.baseClass{
+  transition: all 0.3s;
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5);
+  cursor: pointer;
+  height: 40px;
+  padding: 10px 0px 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.colorGreen{
+  color: green !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.deleteTournamentButton{
+  height: 38px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px 10px 15px;
+  font-size: 20px;
+  background-color: rgba(128, 0, 0, 0.5);
+}
+
+.deleteTournamentButton:hover{
+  background-color: rgba(128, 0, 0, 0.7);
+}
+
+.trashIcon{
+  transition: all 0.3s;
+}
+
+.deleteTournamentButton:hover .trashIcon{
+  transform: scale(0.9)
+}
+
+.deleteTournamentButton:hover{
+  background-color: rgba(156, 114, 36, 0.6);
+}
+
+.selectedTournament{
+  background-color: rgba(156, 114, 36, 0.6);
+  border: 1px solid rgb(248, 170, 26) !important;
+}
+
+.selectedPlayer{
+  background-color: rgba(156, 114, 36, 0.6);
+  border: 1px solid rgb(248, 170, 26) !important;
+}
+
+.playersContainer{
+  height: 100%;
+  flex-grow:3;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  justify-content: center;
+}
+
+.playersResultsContainer{
+  display: flex;
+}
+
+.startedTournament{
+  background-color: rgba(0, 128, 0, 0.2);
+  border: none !important; 
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5) !important;
+}
+
+.finishedTournament{
+  background-color: rgba(128, 0, 0, 0.2);
+  border: none !important; 
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5) !important;
+}
+
+.playersResults{
+  width: 48%;
+  color: #fff;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  height: 60vh;
+  margin-top: 50px !important;
+  justify-content: flex-end;
+  margin-right: 20px;
+}
+
+.playersResults:last-child{
+  margin-right: 0 !important;
+}
+
+.playersResults div{
+  height: 91%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.tournamentName{
+  color: rgb(248, 170, 26)
+}
+
+.playersResults h3{
+  height: 40px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(156, 114, 36, 0.6);
+  width: 100%;
+  padding: 10px;
+  z-index: 2000;
+  border-bottom: 1px solid rgb(248, 170, 26) !important;
+}
+
+.playersResults p{
+  transition: all 0.3s;
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5);
+  cursor: pointer;
+  height: 40px;
+  padding: 10px 0px 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.playersResults p > span{
+  display: flex;
+}
+
+.playersResults p:hover{
+  background-color: rgba(156, 114, 36, 0.6);
+}
+
+.addPlayer{
+  height: 130px;
+  display: flex;
+}
+
+.addPlayerContainer{
+  display: flex;
+  flex-direction: column;
+  margin-right: 20px !important;
+  width: 48%;
+}
+
+.addPlayerDiv{
+  display: flex;
+  overflow: hidden;
+}
+
+.addPlayerDiv > div {
+  display: flex;
+  padding-top: 13px;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 50% !important;
+  height: 106px;
+}
+
+.addPlayerContainer > h4{
+  color: #fff;
+}
+
+.addPlayer input{
+  height: 40px !important;
+  padding: 0 0 0 5px;
+  width: 90%;
+}
+
+.addPlayer input:focus{
+  border: 1px solid rgb(248, 170, 26); /* Puedes ajustar el color y el ancho según tus preferencias */
+  border-radius: 5px;
+}
+
+.addPlayer button{
+  color: #fff;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 93px;
+  width: 20%;
+  transition: all 0.3s;
+  margin-top: 13px;
+  box-sizing: content-box;
+}
+
+.tournamentRounds{
+  width: 50px !important;
+}
+
+.byeContainer{
+  display: flex;
+  flex-direction: column!important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+.containerBye{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  margin-top: 8px;
+  height: 20px !important;
+}
+
+.containerBye input:first-child{
+  margin-left: 6px !important;
+}
+
+.containerBye input:last-child{
+  margin-left: 6px !important
+}
+
+.byeContainer p{
+  color: #fff;
+  margin-bottom: 13px;
+}
+
+.tournamentDetails label {
+  color: #fff;
+}
+
+.inputBye{
+  margin: 10px !important;
+}
+
+.inputBye:active{
+  border: none !important;
+  outline: none !important
+}
+
+.addPlayer button:hover{
+  background-color: rgba(156, 114, 36, 0.6);
+}
+
+.tournamentDetails{
+  height: 100%;
+  width: 48%;
+}
+
+.tournamentDetails > div{
+  height: 90px;
+  display: flex;
+  width: 70%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tournamentDetails > div > div{
+  height: 100%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tournamentDetails > div > div > label{
+  margin-bottom: 13px;
+}
+
+.tournamentDetails > div > div input{
+  height: 30px;
+}
+
+.d-none{
+  display: none !important;
+}
+
+.addPlayerButton{
+  height: 39px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px 10px 15px;
+  font-size: 20px;
+  background-color: rgba(3, 176, 43, 0.25);
+  right: 0 !important;
+}
+
+.addPlayerButton:hover{
+  background-color: rgba(3, 176, 43, 0.5);
+}
+
+.addIcon{
+  transition: all 0.3s;
+}
+
+.addPlayerButton:hover .addIcon{
+  transform: scale(0.9)
+}
+
+
+/* STARTED TOURNAMENT */
+
+.startedTournamentContainer{
+  display: flex;
+  justify-content: space-between;
+}
+
+.startedTournamentRoundsContainer{
+  width: 40%;
+  border-right: 1px solid red;
+}
+
+.startedTournamentRoundsContainer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.startedTournamentRoundsContainer > div{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.startedTournamentRoundsContainer > div > p{
+  color: #fff;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  padding: 10px;
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid hsla(0, 0%, 13%, 0.8);
+}
+
+.startedTournamentRoundsContainer > div > p:hover{
+  background-color: rgba(156, 114, 36, 0.6);
+  border: 1px solid rgb(248, 170, 26) 
+}
+
+.startedTournamentRoundsContainer > div button{
+  background-color: rgba(156, 114, 36, 0.6);
+  border: 1px solid rgb(248, 170, 26);
+  padding: 20px;
+  transition: all 0.3s;
+  cursor: pointer;
+  margin-top: 20px;
+  color: #fff;
+  width: 90%;
+}
+
+.startedTournamentRoundsContainer > div:last-child{
+  justify-content: flex-start;
+}
+
+.startedTournamentRoundsContainer > div button:hover{
+  background-color: hsla(0, 0%, 13%, 0.8);
+  border: 1px solid hsla(0, 0%, 13%, 0.8);
+}
+
+.startedTournamentPairing{
+  background-color: green;
+  width: 100%;
+}
+
+.startedTournamentResults{
+  background-color: blue;
+  width: 60%;
+  height: 92vh;
 }
