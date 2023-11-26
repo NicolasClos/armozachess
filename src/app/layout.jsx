@@ -6,7 +6,10 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'ArmozaChess',
-  description: 'Armoza Chess',
+  description: 'Chess CentroCulturalArmoza',
+  icons: {
+    icon: '/logo.png',
+  }
 }
 
 export default function RootLayout({

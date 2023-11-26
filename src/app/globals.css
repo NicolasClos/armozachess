@@ -11,12 +11,18 @@
   z-index: 100;
   user-select: none;
 }
+
+body{
+  overflow: hidden!important;
+}
+
 .colorRed{
   color: red;
   position: absolute;
   bottom: -35px;
   font-size: 14px;
 }
+
 header{
   width: 100%;
   height: 8vh;
@@ -61,7 +67,7 @@ header nav ul li a{
 }
 
 header nav ul li a:hover{
-  background-color: #111;
+  background-color: hsla(0, 0%, 7%, 0.5);
 }
 
 main{
@@ -377,6 +383,12 @@ main div h3{
   padding: 0 0 0 5px;
   width: 90%;
 }
+ input:focus{
+  outline: none ;
+  box-shadow: none;
+  border: 1px solid rgb(248, 170, 26); /* Puedes ajustar el color y el ancho según tus preferencias */
+  border-radius: 5px; 
+}
 
 .addPlayer input:focus{
   border: 1px solid rgb(248, 170, 26); /* Puedes ajustar el color y el ancho según tus preferencias */
@@ -475,6 +487,34 @@ main div h3{
   height: 30px;
 }
 
+.tournamentDetails > div > div > div{
+  display: flex;
+}
+
+.tournamentDetails > div > div > div > div{
+  display: flex;
+  flex-direction: column;
+  height: 40px;
+  width: 30px;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.tournamentDetails > div > div > div > div button{
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .d-none{
   display: none !important;
 }
@@ -512,23 +552,23 @@ main div h3{
 
 .startedTournamentRoundsContainer{
   width: 40%;
-  border-right: 1px solid red;
 }
 
 .startedTournamentRoundsContainer{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  margin-top: 100px;
+  height: 75vh !important;
 }
 
 .startedTournamentRoundsContainer > div{
   width: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
   align-items: center;
-  justify-content: space-around;
+  overflow: auto;
+  max-height: 55vh;
 }
 
 .startedTournamentRoundsContainer > div > p{
@@ -542,6 +582,7 @@ main div h3{
   cursor: pointer;
   transition: all 0.3s;
   border: 1px solid hsla(0, 0%, 13%, 0.8);
+  margin-bottom: 10px;
 }
 
 .startedTournamentRoundsContainer > div > p:hover{
@@ -560,9 +601,7 @@ main div h3{
   width: 90%;
 }
 
-.startedTournamentRoundsContainer > div:last-child{
-  justify-content: flex-start;
-}
+
 
 .startedTournamentRoundsContainer > div button:hover{
   background-color: hsla(0, 0%, 13%, 0.8);
@@ -570,12 +609,147 @@ main div h3{
 }
 
 .startedTournamentPairing{
-  background-color: green;
   width: 100%;
 }
 
 .startedTournamentResults{
-  background-color: blue;
   width: 60%;
   height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100px;
+}
+
+.startedTournamentResults ul{
+  height: 80%;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.startedTournamentResults ul div{
+  overflow: auto;
+  border: 1px solid rgba(202, 202, 202, 0.5);
+}
+
+.startedTournamentResults ul li{
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5);
+  background-color: hsla(0, 0%, 13%, 0.8);
+}
+
+.startedTournamentResults ul > li:first-child{
+  background-color: rgba(156, 114, 36, 0.6);
+  border: 1px solid rgb(248, 170, 26);
+}
+
+.startedTournamentResults ul li span:first-child{
+
+}
+
+/* PAIRING */
+
+.pairingContainer{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  height: 92vh;
+  padding: 40px;
+  padding-top: 0;
+}
+
+.pairingContainer h2{
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff
+}
+
+.pairingContainer ul{
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+  overflow-y: auto;
+}
+
+.pairingContainer ul li{
+  display: flex;
+  color: #fff;
+  width: 100%;
+  align-items: center;
+  height: 40px;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5);
+  margin: 10px;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-height: 80px;
+  
+}
+
+.pairingContainer ul li{
+  margin-top: 0 !important;
+}
+
+.pairingContainer ul li span{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  width: 33.3%;
+}
+
+.pairingContainer ul li span{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  width: 33.3%;
+}
+
+.pairingContainer ul li span:last-child{
+  justify-content: flex-end!important;
+  padding-right: 10px;
+}
+
+.pairingContainer ul li span:first-child{
+  padding-left: 10px;
+}
+
+.pairingContainer ul li span button{
+  height: 38px !important;
+  width: 100%;
+  display: flex;
+  background-color: rgba(156, 114, 36, 0.6);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: 1px solid rgb(248, 170, 26)
+}
+
+.pairingContainer ul li span button:nth-child(2){
+  background-color: hsla(0, 0%, 13%, 0.8)
+}
+
+.pairingContainer ul li span button:nth-child(2):hover{
+  background-color: hsla(0, 0%, 7%, 1.0);
+}
+
+.pairingContainer ul li span button:last-child{
+  color: #000;
+}
+
+.pairingContainer ul li span button:hover{
+  background-color: hsla(0, 0%, 13%, 0.8);
 }

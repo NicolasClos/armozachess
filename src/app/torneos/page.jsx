@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 
 import Link from 'next/link'
 
-import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentRounds, updateTournamentStarted } from '../../components/fileOperations';
+import { BsChevronDown, BsChevronUp } from "react-icons/bs";
+
+import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentRounds, updateTournamentStarted, getSelectedTournament } from '@/components/fileOperations';
 
 import { BsTrash } from "react-icons/bs";
 
@@ -18,6 +20,16 @@ const Torneos = () => {
 
   const [players, setPlayers] = useState([])
 
+  const [tournament, setTournament] = useState({})
+
+  /* ------ */
+
+  const [selectedAllPlayer, setSelectedAllPlayer] = useState({})
+
+  const [selectedTournament, setSelectedTournament] = useState({})
+
+  const [selectedPlayer, setSelectedPlayer] = useState({})
+
   /* ------ */
 
   const [inputTournament, setInputTournament] = useState('')
@@ -29,14 +41,6 @@ const Torneos = () => {
   const [rounds, setRounds] = useState(6)
 
   const [bye, setBye] = useState(0.5)
-
-  /* ------ */
-
-  const [selectedAllPlayer, setSelectedAllPlayer] = useState({})
-
-  const [selectedTournament, setSelectedTournament] = useState({})
-
-  const [selectedPlayer, setSelectedPlayer] = useState({})
 
   /* ------ */
 
@@ -55,7 +59,7 @@ const Torneos = () => {
     setTournaments(getTournaments());
     setPlayers(getPlayersByTournament(selectedTournament));
     setShowP(true)
-    setTimeout(()=>{
+    setTimeout(() => {
       setShowP(false);
       setInputPlayerName('')
       setInputPlayerSurname('');
@@ -69,7 +73,7 @@ const Torneos = () => {
   }
 
   const torneoVacio = () => {
-    setSelectedTournament({}); 
+    setSelectedTournament({});
     updateSelectedTournament({})
   }
 
@@ -96,24 +100,25 @@ const Torneos = () => {
     );
 
     const inputPlayer = existingPlayer || inputPlayerName === '' || inputPlayerSurname === '' ? <p color='colorRed'>O el jugador ya se encuentra en el torneo o no está completando nombre y apellido.</p> : <p className='colorGreen'>Creado correctamente</p>;
-  
+
     return inputPlayer;
   };
-  
 
   /* EFFECTS */
 
   useEffect(() => {
     setPlayers(getPlayersByTournament(selectedTournament));
     setTournaments(getTournaments());
+    setTournament(getSelectedTournament())
   }, [])
 
   useEffect(() => {
     setPlayers(getPlayersByTournament(selectedTournament));
-    
+    setRounds(selectedTournament.rounds)
+    setBye(selectedTournament.byeValue)
   }, [selectedTournament, updatePlayers])
 
-  useEffect(()=>{
+  useEffect(() => {
     updateSelectedTournament(selectedTournament);
   }, [selectedTournament, addPlayerToList, deletePlayerFromList, bye, rounds])
 
@@ -126,8 +131,7 @@ const Torneos = () => {
     updateSelectedTournament(selectedTournament);
   }, [toggle])
 
-  useEffect(()=>{
-    setSelectedTournament({...selectedTournament, rounds: rounds, byeValue: bye});
+  useEffect(() => {
     updateTournamentByeValue(selectedTournament, bye)
     updateTournamentRounds(selectedTournament, rounds)
   }, [bye, rounds])
@@ -192,19 +196,36 @@ const Torneos = () => {
           <div className={showP ? 'colorRed' : 'd-none'}>
             {errorCreatePlayer()}
           </div>
-          
           <div className='tournamentDetails'>
             <div>
               <div>
                 <label>Rondas</label>
-                <input disabled={selectedTournament.started ? true : false} type="number" className='tournamentRounds' min={2} max={12} value={rounds}
-                  onChange={(e) => {setRounds(e.target.value)
-                  setToggle(!toggle)}} />
+                <div>
+                  
+                  <input disabled={selectedTournament.started ? true : false} type="number" className='tournamentRounds' min={2} max={12} readOnly value={rounds}
+                  />
+                  <div className={selectedTournament.started ? 'd-none' : ''}>
+                    <button onClick={() => {
+                      if (rounds < 12) {
+                        setRounds(rounds + 1)
+                      }
+                    }}>
+                      <BsChevronUp />
+                    </button>
+                    <button onClick={() => {
+                      if (rounds > 2) {
+                        setRounds(rounds - 1)
+                      }
+                    }}>
+                      <BsChevronDown />
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className='byeContainer'>
+              <div className={!selectedTournament.started ? 'byeContainer' : 'd-none'}>
                 <p>Editar valor del BYE</p>
                 <label className='containerBye'>
-                0.5
+                  0.5
                   <input
                     className='w-5 h-5 inputBye'
                     disabled={selectedTournament.started ? true : false}
@@ -216,7 +237,7 @@ const Torneos = () => {
                   />
                   1
                   <input
-                    className='w-5 h-5 inputBye'
+                    className='inputBye'
                     disabled={selectedTournament.started ? true : false}
                     type="radio"
                     name="byeOption"
@@ -226,19 +247,42 @@ const Torneos = () => {
                   />
                 </label>
               </div>
-            </div> 
-            <Link href={selectedTournament && `/torneos/${selectedTournament.name}`} className={'startTournament'} onClick={() => {
-              updateTournamentRounds(selectedTournament, rounds);
-              updateTournamentByeValue(selectedTournament, bye)
-              updateTournamentStarted(selectedTournament, true);
-              setTournaments(tournaments);
-              setSelectedTournament({...selectedTournament, rounds: rounds, byeValue: bye})
-              updateSelectedTournament({});
-              updateSelectedTournament(selectedTournament);
-              
-            }}>
-              {selectedTournament.started ? 'IR A TORNEO' : 'COMENZAR TORNEO'}
-            </Link>
+            </div>
+            {selectedTournament.started ?
+              <Link
+                href={selectedTournament && `/torneos/${selectedTournament && selectedTournament.name ? selectedTournament.name.toLowerCase() : ''}`
+                }
+                className={'startTournament'}
+                onClick={() => {
+                  updateTournamentRounds(selectedTournament, rounds)
+                  updateTournamentByeValue(selectedTournament, bye)
+                  updateTournamentStarted(selectedTournament, true)
+                  setTournaments(tournaments)
+                  updateSelectedTournament({})
+                  updateSelectedTournament(selectedTournament)
+                }}>
+                IR A TORNEO
+              </Link>
+              : <Link
+                href={selectedTournament &&
+                  `/torneos/${selectedTournament && selectedTournament.name ? selectedTournament.name.toLowerCase() : ''}`
+                }
+                className={'startTournament'}
+                onClick={() => {
+                  updateTournamentRounds(selectedTournament, rounds)
+                  updateTournamentByeValue(selectedTournament, bye)
+                  updateTournamentStarted(selectedTournament, true)
+                  setTournaments(tournaments)
+                  if(selectedTournament.started){
+                    setSelectedTournament({ ...selectedTournament,results: [players, [...players, { name: "NICOLASTU" }]], players: players })
+                  } else{
+                    setSelectedTournament({ ...selectedTournament, byeValue: bye, rounds: rounds,results: [players, [...players, { name: "NICOLASTU" }]], players: players })
+                  }
+                  updateSelectedTournament({})
+                  updateSelectedTournament(selectedTournament)
+                }}>
+                COMENZAR TORNEO
+              </Link>}
           </div>
         </div>
         <div className='playersResultsContainer'>
