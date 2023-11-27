@@ -12,19 +12,34 @@ const Start = () => {
 
   const [selectedRound, setSelectedRound] = useState({})
 
+  const [rounds, setRounds] = useState({})
+
   useEffect(() => {
     setTournament(getSelectedTournament());
+    setRounds(tournament.rounds);
+    
   }, [])
+
+  useEffect(()=>{
+    setRounds(tournament.rounds)
+    setSelectedRound(tournament.rounds && tournament.rounds[0])
+  }, [tournament])
+
+  // console.log(selectedRound)
 
   return (
     <div className='startedTournamentContainer'>
       <div className='startedTournamentRoundsContainer'>
         <div>
           {
-            tournament && tournament.rounds &&
-            Number.isInteger(parseFloat(tournament.rounds)) &&
-            Array(parseInt(tournament.rounds, 10)).fill().map((_, index) => (
-              <p key={index}>{'Ronda ' + (index + 1)}</p>
+            tournament && tournament.rounds && rounds &&
+            rounds.map((round, index) => (
+              <div key={index}>
+                <p className={selectedRound === round ? 'selectedRound' : ''}
+                onClick={()=>{
+                  setSelectedRound(round)
+                }}>{'Ronda ' + (index + 1)}</p>
+              </div>
             ))
           }
         </div>
@@ -34,7 +49,7 @@ const Start = () => {
 
       </div>
       <div className='startedTournamentPairing'>
-        <Matchmaking players={tournament && tournament.players} />
+        <Matchmaking players={selectedRound && selectedRound.playersRound} prevPairings={selectedRound && selectedRound.pairings} />
       </div>
       <div className='startedTournamentResults'>
         <ul>
@@ -45,8 +60,8 @@ const Start = () => {
               tournament.players
                 .slice() // Crear una copia del array para no modificar el original
                 .sort((a, b) => b.points - a.points) // Ordenar por puntos de mayor a menor
-                .map((player) => (
-                  <li key={player.id}>
+                .map((player, index) => (
+                  <li key={index}>
                     <span>{player.name} {player.surname}</span>
                     <span>{player.points}</span>
                   </li>

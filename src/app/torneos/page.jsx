@@ -77,6 +77,18 @@ const Torneos = () => {
     updateSelectedTournament({})
   }
 
+  function roundsArray(cantidad) {
+
+    const arrayRounds =  Array.from({ length: cantidad }, (_, index) => ({
+      round: Number(index + 1),
+      playersRound: players,
+      pairings: []
+    }));
+
+    return arrayRounds
+
+  }
+
   const clasesDelTorneo = (torneo) => {
     const claseSeleccionado = selectedTournament && selectedTournament.name === torneo.name
       ? 'selectedTournament'
@@ -276,7 +288,7 @@ const Torneos = () => {
                   if(selectedTournament.started){
                     setSelectedTournament({ ...selectedTournament,results: [players, [...players, { name: "NICOLASTU" }]], players: players })
                   } else{
-                    setSelectedTournament({ ...selectedTournament, byeValue: bye, rounds: rounds,results: [players, [...players, { name: "NICOLASTU" }]], players: players })
+                    setSelectedTournament({ ...selectedTournament, byeValue: bye, rounds: roundsArray(rounds),results: [players, [...players, { name: "NICOLASTU" }]], players: players })
                   }
                   updateSelectedTournament({})
                   updateSelectedTournament(selectedTournament)
