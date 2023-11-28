@@ -110,6 +110,19 @@ export const updateTournamentResults = (tournamentName, results) => {
   localStorage.setItem("tournaments", JSON.stringify(updatedTournaments));
 };
 
+export const updateTournamentPlayers = (tournamentName, players) => {
+  const tournaments = getTournaments();
+
+  const updatedTournaments = tournaments.map(tournament => {
+    if (tournament.name === tournamentName.name) {
+      return { ...tournament, players: players };
+    }
+    return tournament;
+  });
+
+  localStorage.setItem("tournaments", JSON.stringify(updatedTournaments));
+};
+
 export const deleteTournament = (tournament) => {
   const tournaments = getTournaments();
 

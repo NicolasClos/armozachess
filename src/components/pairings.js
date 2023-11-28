@@ -39,7 +39,7 @@ export function generarEmparejamientosSuizos(jugadores, emparejamientosPrevios) 
 
       // Si no se encontró un emparejamiento y es el último jugador, emparejarlo con BYE
       if (!emparejamientoEncontrado && i === jugadores.length - 1) {
-        emparejamientos.push({ firstPlayer, secondPlayer: { name: 'BYE' } });
+        emparejamientos.push({ firstPlayer, secondPlayer: { name: 'BYE', surname: '' } });
         jugadoresUtilizados.add(firstPlayer);
       }
     }

@@ -17,7 +17,6 @@ const Start = () => {
   useEffect(() => {
     setTournament(getSelectedTournament());
     setRounds(tournament.rounds);
-    
   }, [])
 
   useEffect(()=>{

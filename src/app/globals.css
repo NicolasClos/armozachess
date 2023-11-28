@@ -504,9 +504,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
-input[type="number"] {
-  -moz-appearance: textfield;
-}
+
 
 .tournamentDetails > div > div > div > div button{
   width: 100%;
@@ -658,10 +656,6 @@ input[type="number"] {
   border: 1px solid rgb(248, 170, 26);
 }
 
-.startedTournamentResults ul li span:first-child{
-
-}
-
 /* PAIRING */
 
 .pairingContainer{
@@ -770,4 +764,8 @@ input[type="number"] {
   width: 33%;
   height: 40px;
   cursor: pointer;
+}
+
+.selectedWinner{
+  background-color: rgba(0, 128, 0, 0.2) !important;
 }
