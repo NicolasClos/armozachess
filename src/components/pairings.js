@@ -1,49 +1,80 @@
 export function generarEmparejamientosSuizos(jugadores, emparejamientosPrevios) {
   const emparejamientos = [];
+  let players = jugadores.slice();
   const jugadoresUtilizados = new Set();
 
-  // Ordenar jugadores por puntos y rendimiento
-  jugadores && jugadores.sort((a, b) => b.points - a.points);
+  const obtenerPermutacionAleatoria = (array) =>
+    array.slice().sort(() => Math.random() - 0.5);
 
-  // Función para verificar si un emparejamiento es válido
+  players = obtenerPermutacionAleatoria(players);
+
+  const haTenidoBYE = (jugador, emparejamientosPrevios) =>
+    emparejamientosPrevios.some(
+      (emparejamiento) =>
+        emparejamiento.firstPlayer === jugador ||
+        (emparejamiento.secondPlayer === jugador && emparejamiento.secondPlayer.name !== 'BYE')
+    );
+
+  const haJugadoEntreEllos = (firstPlayer, secondPlayer, emparejamientosPrevios) =>
+    emparejamientosPrevios.some(
+      (emparejamiento) =>
+        (emparejamiento.firstPlayer === firstPlayer.id && emparejamiento.secondPlayer === secondPlayer.id) ||
+        (emparejamiento.firstPlayer === secondPlayer.id && emparejamiento.secondPlayer === firstPlayer.id)
+    );
+
   const esEmparejamientoValido = (firstPlayer, secondPlayer) => {
     return !(
       jugadoresUtilizados.has(firstPlayer) ||
       jugadoresUtilizados.has(secondPlayer) ||
-      emparejamientosPrevios.some(
-        (emparejamiento) =>
-          (emparejamiento.firstPlayer === firstPlayer && emparejamiento.secondPlayer === secondPlayer) ||
-          (emparejamiento.firstPlayer === secondPlayer && emparejamiento.secondPlayer === firstPlayer)
-      )
+      haTenidoBYE(firstPlayer, emparejamientosPrevios) ||
+      haTenidoBYE(secondPlayer, emparejamientosPrevios) ||
+      haJugadoEntreEllos(firstPlayer, secondPlayer, emparejamientosPrevios)
     );
   };
 
-  // Generar emparejamientos
-  if (jugadores) {
-    for (let i = 0; i < jugadores.length; i++) {
-      const firstPlayer = jugadores[i];
+  if (players) {
+    if (players.length % 2 !== 0) {
+      const byePlayer = { name: 'BYE', surname: '' };
+      players.push(byePlayer);
+    }
 
-      // Buscar emparejamiento válido para el jugador actual
+    let jugadorAnterior = null;
+
+    for (let i = 0; i < players.length - 1; i++) {
+      const firstPlayer = players[i];
       let emparejamientoEncontrado = false;
-      for (let j = i + 1; j < jugadores.length; j++) {
-        const secondPlayer = jugadores[j];
 
-        if (esEmparejamientoValido(firstPlayer, secondPlayer)) {
+      for (let j = i + 1; j < players.length; j++) {
+        const secondPlayer = players[j];
+
+        if (esEmparejamientoValido(firstPlayer, secondPlayer) &&
+          (jugadorAnterior === null || jugadorAnterior !== firstPlayer)) {
           emparejamientos.push({ firstPlayer, secondPlayer });
           jugadoresUtilizados.add(firstPlayer);
           jugadoresUtilizados.add(secondPlayer);
+          jugadorAnterior = secondPlayer;
           emparejamientoEncontrado = true;
           break;
         }
       }
 
-      // Si no se encontró un emparejamiento y es el último jugador, emparejarlo con BYE
-      if (!emparejamientoEncontrado && i === jugadores.length - 1) {
-        emparejamientos.push({ firstPlayer, secondPlayer: { name: 'BYE', surname: '' } });
-        jugadoresUtilizados.add(firstPlayer);
+      if (!emparejamientoEncontrado) {
+        // Si no se encontró un emparejamiento en la primera iteración, realizar una búsqueda más exhaustiva
+        for (let j = 0; j < players.length; j++) {
+          const secondPlayer = players[j];
+
+          if (esEmparejamientoValido(firstPlayer, secondPlayer) &&
+            (jugadorAnterior === null || jugadorAnterior !== firstPlayer)) {
+            emparejamientos.push({ firstPlayer, secondPlayer });
+            jugadoresUtilizados.add(firstPlayer);
+            jugadoresUtilizados.add(secondPlayer);
+            jugadorAnterior = secondPlayer;
+            break;
+          }
+        }
       }
     }
-  }
 
-  return emparejamientos;
+    return emparejamientos;
+  }
 }

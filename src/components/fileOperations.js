@@ -16,20 +16,42 @@ export const createTournament = (tournamentName) => {
 
   const existeTorneo = arrayTournaments.some((tournament) => tournament.name === tournamentName);
 
-  if (existeTorneo) {
-  } else {
-    const newTournament = [{ name: tournamentName, players: [], started: false, finished: false, rounds: 6, byeValue: 0.5, winner: '', results: [] }, ...arrayTournaments];
+  if (existeTorneo) { } else if (tournamentName === '') { } else {
+    const newTournament = [{
+      name: tournamentName,
+      players: [],
+      started: false,
+      finished: false,
+      rounds: [],
+      byeValue: 0.5,
+      winner: '',
+      results: []
+    }, ...arrayTournaments];
     localStorage.setItem("tournaments", JSON.stringify(newTournament));
   }
 };
 
+export const updateTournaments = (tournament) => {
+  let arrayTournaments = getTournaments();
+
+  const updatedTournaments = arrayTournaments.map((t) => t.name == tournament.name ? {
+    ...tournament
+  } : t);
+
+  localStorage.setItem("tournaments", JSON.stringify(updatedTournaments));
+};
+
+export const updateAllTournaments = (tournaments) => {
+  localStorage.setItem("tournaments", JSON.stringify(tournaments));
+};
+
 export const getSelectedTournament = () => {
-    const selectedTournament = localStorage.getItem("selectedTournament");
-    return JSON.parse(selectedTournament)
+  const selectedTournament = localStorage.getItem("selectedTournament");
+  return JSON.parse(selectedTournament)
 };
 
 export const updateSelectedTournament = (selectedTournament) => {
-    localStorage.setItem("selectedTournament", JSON.stringify(selectedTournament));
+  localStorage.setItem("selectedTournament", JSON.stringify(selectedTournament));
 };
 
 export const updateTournamentStarted = (tournamentName, started) => {
@@ -37,7 +59,10 @@ export const updateTournamentStarted = (tournamentName, started) => {
 
   const updatedTournaments = tournaments.map(tournament => {
     if (tournament.name === tournamentName.name) {
-      return { ...tournament, started };
+      return {
+        ...tournament,
+        started
+      };
     }
     return tournament;
   });
@@ -50,7 +75,10 @@ export const updateTournamentFinished = (tournamentName, finished) => {
 
   const updatedTournaments = tournaments.map(tournament => {
     if (tournament.name === tournamentName.name) {
-      return { ...tournament, finished };
+      return {
+        ...tournament,
+        finished
+      };
     }
     return tournament;
   });
@@ -63,7 +91,10 @@ export const updateTournamentRounds = (tournamentName, rounds) => {
 
   const updatedTournaments = tournaments.map(tournament => {
     if (tournament.name === tournamentName.name) {
-      return { ...tournament, rounds };
+      return {
+        ...tournament,
+        rounds
+      };
     }
     return tournament;
   });
@@ -76,7 +107,10 @@ export const updateTournamentByeValue = (tournamentName, byeValue) => {
 
   const updatedTournaments = tournaments.map(tournament => {
     if (tournament.name === tournamentName.name) {
-      return { ...tournament, byeValue };
+      return {
+        ...tournament,
+        byeValue
+      };
     }
     return tournament;
   });
@@ -89,7 +123,10 @@ export const updateTournamentWinner = (tournamentName, winner) => {
 
   const updatedTournaments = tournaments.map(tournament => {
     if (tournament.name === tournamentName.name) {
-      return { ...tournament, winner };
+      return {
+        ...tournament,
+        winner
+      };
     }
     return tournament;
   });
@@ -102,7 +139,10 @@ export const updateTournamentResults = (tournamentName, results) => {
 
   const updatedTournaments = tournaments.map(tournament => {
     if (tournament.name === tournamentName.name) {
-      return { ...tournament, results };
+      return {
+        ...tournament,
+        results
+      };
     }
     return tournament;
   });
@@ -115,7 +155,10 @@ export const updateTournamentPlayers = (tournamentName, players) => {
 
   const updatedTournaments = tournaments.map(tournament => {
     if (tournament.name === tournamentName.name) {
-      return { ...tournament, players: players };
+      return {
+        ...tournament,
+        players: players
+      };
     }
     return tournament;
   });
@@ -173,8 +216,15 @@ export const addPlayer = (tournament, player) => {
     let newArray = tournaments.map((objeto, indice) => {
       if (indice === indiceObjetoAModificar) {
         // Modifica el objeto deseado
-        const newPlayer = { ...player, id: newPlayerId, points: 0 };
-        return { ...objeto, players: objeto.players.concat(newPlayer) };
+        const newPlayer = {
+          ...player,
+          id: newPlayerId,
+          points: 0
+        };
+        return {
+          ...objeto,
+          players: objeto.players.concat(newPlayer)
+        };
       }
       return objeto; // Retorna el objeto sin modificar en los otros casos
     });
@@ -200,8 +250,13 @@ export const addExistingPlayer = (tournament, player) => {
     let newArray = tournaments.map((objeto, indice) => {
       if (indice === indiceObjetoAModificar) {
         // Modifica el objeto deseado
-        const newPlayer = { ...player };
-        return { ...objeto, players: objeto.players.concat(newPlayer) };
+        const newPlayer = {
+          ...player
+        };
+        return {
+          ...objeto,
+          players: objeto.players.concat(newPlayer)
+        };
       }
       return objeto; // Retorna el objeto sin modificar en los otros casos
     });

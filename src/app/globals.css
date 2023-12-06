@@ -160,7 +160,6 @@ main div h3{
 
 .startTournament:hover{
   background-color:rgba(156, 114, 36, 0.5);
-  transform: scale(0.95);
 }
 
 .createTournament{
@@ -233,7 +232,7 @@ main div h3{
 }
 
 .deleteTournamentButton{
-  height: 38px !important;
+  height: 39px !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -411,6 +410,22 @@ main div h3{
 
 .tournamentRounds{
   width: 50px !important;
+  background-color: #fff;
+  width: 50px;
+  height: 40px;
+  display: flex;
+  padding-left: 5px;
+  align-items: center;
+}
+
+.tournamentRoundsStarted{
+  width: 50px !important;
+  background-color: #ffffff59;
+  width: 50px;
+  height: 40px;
+  display: flex;
+  padding-left: 5px;
+  align-items: center;
 }
 
 .byeContainer{
@@ -560,6 +575,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .selectedRound{
   background-color: rgba(156, 114, 36, 0.6) !important;
   border: 1px solid rgb(248, 170, 26) !important;
+  cursor: pointer !important;
 }
 
 .startedTournamentRoundsContainer > div{
@@ -738,7 +754,8 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  outline: 1px solid rgb(248, 170, 26)
+  outline: 1px solid rgb(248, 170, 26);
+  
 }
 
 .pairingContainer ul li span button:nth-child(2){
@@ -753,7 +770,7 @@ input[type="number"]::-webkit-outer-spin-button {
   color: #000;
 }
 
-.pairingContainer ul li span button:hover{
+.pairingContainer ul li span button:hover:not(.changeResultsButton){
   background-color: hsla(0, 0%, 13%, 0.8);
 }
 
@@ -764,8 +781,74 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 33%;
   height: 40px;
   cursor: pointer;
+  transition: all 0.3s;
+}
+
+.byeButton{
+  color: #fff !important;
+}
+
+.nextRound:hover{
+  background-color: hsla(0, 0%, 13%, 0.8);
+  border: 1px solid hsla(0, 0%, 13%, 1);
+}
+
+.nextRoundDisabled{
+  color: #fff;
+  background-color: hsla(0, 0%, 13%, 0.8);
+  width: 33%;
+  height: 40px;
+  cursor: default !important;
 }
 
 .selectedWinner{
   background-color: rgba(0, 128, 0, 0.2) !important;
+}
+
+.selectedBye{
+  color: #fff !important;
+  background-color: rgba(0, 128, 0, 0.2) !important;
+}
+
+.disabledRound{
+  background-color: hsla(0, 0%, 13%, 0.8) !important;
+  cursor: default!important;
+
+}
+
+.disabledRound:hover{
+  border: 1px solid hsla(0, 0%, 13%, 0.8) !important;
+}
+
+.finalResultsContainer{
+  background-color: hsla(0, 0%, 13%, 0.8);
+  width: 40%;
+  margin-top: 50px;
+}
+
+
+
+.finalResults{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: auto;
+}
+
+.finalResults li{
+  width: 100%;
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5);
+  height: 40px;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  color: #fff;
+}
+
+.finalResults li:first-child{
+  background-color: rgba(156, 114, 36, 0.6);
+  border-bottom: 1px solid rgb(248, 170, 26);
 }

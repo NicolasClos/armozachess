@@ -6,11 +6,13 @@ import Link from 'next/link'
 
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 
-import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentRounds, updateTournamentStarted, getSelectedTournament } from '@/components/fileOperations';
+import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentStarted, updateTournaments, updateAllTournaments } from '@/components/fileOperations';
 
 import { BsTrash } from "react-icons/bs";
 
 import { MdAddCircle } from "react-icons/md";
+
+import { generarEmparejamientosSuizos } from '@/components/pairings'
 
 const Torneos = () => {
 
@@ -78,17 +80,24 @@ const Torneos = () => {
   }
 
   function roundsArray(cantidad) {
+    const arrayRounds = Array.from({ length: cantidad }, (_, index) => {
+      const isLast = index === cantidad - 1;
 
-    const arrayRounds =  Array.from({ length: cantidad }, (_, index) => ({
-      round: Number(index + 1),
-      playersRound: players,
-      pairings: []
-    }));
 
-    return arrayRounds
 
+      return {
+        round: Number(index + 1),
+        playersRound: players,
+        winners: [],
+        pairings: index === 0 ? generarEmparejamientosSuizos(players, []) : [],
+        started: index === 0,
+        finished: false,
+        isLast: isLast,
+      };
+    });
+
+    return arrayRounds;
   }
-
   const clasesDelTorneo = (torneo) => {
     const claseSeleccionado = selectedTournament && selectedTournament.name === torneo.name
       ? 'selectedTournament'
@@ -120,13 +129,6 @@ const Torneos = () => {
 
   useEffect(() => {
     setPlayers(getPlayersByTournament(selectedTournament));
-    setTournaments(getTournaments());
-    setTournament(getSelectedTournament())
-  }, [])
-
-  useEffect(() => {
-    setPlayers(getPlayersByTournament(selectedTournament));
-    setRounds(selectedTournament.rounds)
     setBye(selectedTournament.byeValue)
   }, [selectedTournament, updatePlayers])
 
@@ -145,7 +147,6 @@ const Torneos = () => {
 
   useEffect(() => {
     updateTournamentByeValue(selectedTournament, bye)
-    updateTournamentRounds(selectedTournament, rounds)
   }, [bye, rounds])
 
   return (
@@ -213,9 +214,8 @@ const Torneos = () => {
               <div>
                 <label>Rondas</label>
                 <div>
-                  
-                  <input disabled={selectedTournament.started ? true : false} type="number" className='tournamentRounds' min={2} max={12} readOnly value={rounds}
-                  />
+                  <p className={selectedTournament.started ? 'tournamentRoundsStarted' : 'tournamentRounds'}
+                  >{selectedTournament.started ? selectedTournament.rounds.length : rounds}</p>
                   <div className={selectedTournament.started ? 'd-none' : ''}>
                     <button onClick={() => {
                       if (rounds < 12) {
@@ -260,13 +260,12 @@ const Torneos = () => {
                 </label>
               </div>
             </div>
-            {selectedTournament.started ?
-              <Link
+            {selectedTournament.started && !selectedTournament.finished ?
+              (<Link
                 href={selectedTournament && `/torneos/${selectedTournament && selectedTournament.name ? selectedTournament.name.toLowerCase() : ''}`
                 }
                 className={'startTournament'}
                 onClick={() => {
-                  updateTournamentRounds(selectedTournament, rounds)
                   updateTournamentByeValue(selectedTournament, bye)
                   updateTournamentStarted(selectedTournament, true)
                   setTournaments(tournaments)
@@ -274,24 +273,28 @@ const Torneos = () => {
                   updateSelectedTournament(selectedTournament)
                 }}>
                 IR A TORNEO
-              </Link>
-              : <Link
+              </Link>)
+              : selectedTournament.finished ? '' : <Link
                 href={selectedTournament &&
                   `/torneos/${selectedTournament && selectedTournament.name ? selectedTournament.name.toLowerCase() : ''}`
                 }
                 className={'startTournament'}
                 onClick={() => {
-                  updateTournamentRounds(selectedTournament, rounds)
-                  updateTournamentByeValue(selectedTournament, bye)
-                  updateTournamentStarted(selectedTournament, true)
                   setTournaments(tournaments)
-                  if(selectedTournament.started){
-                    setSelectedTournament({ ...selectedTournament,results: [players, [...players, { name: "NICOLASTU" }]], players: players })
-                  } else{
-                    setSelectedTournament({ ...selectedTournament, byeValue: bye, rounds: roundsArray(rounds),results: [players, [...players, { name: "NICOLASTU" }]], players: players })
-                  }
+                  setSelectedTournament({ ...selectedTournament, byeValue: bye, rounds: roundsArray(rounds), results: players.map(player => { return { ...player, points: 0 } }), players: players.map(player => { return { ...player, points: 0 } }) })
                   updateSelectedTournament({})
                   updateSelectedTournament(selectedTournament)
+                  updateAllTournaments(tournaments)
+                  updateTournaments({
+                    ...selectedTournament, byeValue: bye, rounds: roundsArray(rounds), results: players.map(player => { return { ...player, points: 0 } }), players:
+                      players.map(player => {
+                        if (player.name !== 'BYE') {
+                          return { ...player, points: 0 }
+                        } else {
+                          return {}
+                        }
+                      }), started: true
+                  })
                 }}>
                 COMENZAR TORNEO
               </Link>}
@@ -301,7 +304,9 @@ const Torneos = () => {
           <div className='playersResults'>
             <h3>Jugadores del torneo:<span className='tournamentName'>&nbsp;{selectedTournament.name}</span></h3>
             <div>
-              {players && Object.keys(selectedTournament).length !== 0 ? players.map((player, index) => {
+              {players && Object.keys(selectedTournament).length !== 0 ? players.filter(
+                (player) => player.name !== 'BYE'
+              ).map((player, index) => {
                 return (
                   <p onClick={() => {
                     setSelectedPlayer(player);
@@ -320,7 +325,9 @@ const Torneos = () => {
           <div className={selectedTournament.started ? 'd-none playersResults' : 'playersResults'}>
             <h3>AGREGADO RAPIDO</h3>
             <div>
-              {Object.keys(selectedTournament).length !== 0 ? getAllPlayers(players).map((player, index) => {
+              {Object.keys(selectedTournament).length !== 0 ? getAllPlayers(players).filter(
+                (player) => player.name !== 'BYE'
+              ).map((player, index) => {
                 return (
                   <p onClick={() => {
                     setSelectedAllPlayer(player);
@@ -335,6 +342,21 @@ const Torneos = () => {
                 )
               }) : ''}
             </div>
+          </div>
+          <div className={selectedTournament.finished ? 'finalResultsContainer' : 'd-none'}>
+            <ul className='finalResults'>
+              <li><span>Jugador</span><span>Puntos</span></li>
+              {selectedTournament.results &&
+                selectedTournament.results
+                  .slice()
+                  .sort((a, b) => b.points - a.points)
+                  .map((player, index) => (
+                    <li key={index}>
+                      <span>{index + 1}.{`   ${player.name} ${player.surname}`}</span>
+                      <span>{player.points}</span>
+                    </li>
+                  ))}
+            </ul>
           </div>
         </div>
       </div>
