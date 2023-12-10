@@ -290,8 +290,6 @@ const Start = () => {
     }
   }, []);
 
-  console.log(previousPairings)
-
   useEffect(() => {
 
     if (tournament && pairings.length && winners.length) {

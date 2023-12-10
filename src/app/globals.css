@@ -216,13 +216,21 @@ main div h3{
 
 .baseClass{
   transition: all 0.3s;
-  border-bottom: 1px solid rgba(202, 202, 202, 0.5);
+  border-top: none !important;
+  border-right: none !important;
+  border-left: none !important;
+  border-bottom: 1px solid rgba(202, 202, 202, 0.5) !important;
   cursor: pointer;
   height: 40px;
   padding: 10px 0px 10px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  
+}
+
+.baseClass:hover{
+  background-color: rgba(156, 114, 36, 0.6);
 }
 
 .colorGreen{
@@ -244,7 +252,7 @@ main div h3{
 }
 
 .deleteTournamentButton:hover{
-  background-color: rgba(128, 0, 0, 0.7);
+  background-color: rgba(128, 0, 0, 0.7) !important;
 }
 
 .trashIcon{
@@ -271,9 +279,10 @@ main div h3{
 
 .playersContainer{
   height: 100%;
+  display: flex;
   flex-grow: 1;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between !important;
   padding: 40px !important;
 }
 
@@ -289,10 +298,26 @@ main div h3{
   border-bottom: 1px solid rgba(202, 202, 202, 0.5) !important;
 }
 
+.startedTournament:hover{
+  background-color: rgba(0, 128, 0, 0.3);
+}
+
 .finishedTournament{
   background-color: rgba(128, 0, 0, 0.2);
   border: none !important; 
   border-bottom: 1px solid rgba(202, 202, 202, 0.5) !important;
+}
+
+.finishedTournament:hover{
+  background-color: rgba(128, 0, 0, 0.3)!important;
+}
+
+.selectedFinishedTournament{
+  border: 1px solid rgb(88, 27, 27) !important;
+}
+
+.selectedStartedTournament{
+  border: 1px solid rgb(23, 77, 23) !important;
 }
 
 .playersResults{
@@ -301,7 +326,6 @@ main div h3{
   background-color: hsla(0, 0%, 13%, 0.8);
   justify-content: flex-end;
   margin-right: 20px;
-
 }
 
 .tournamentDetailsInfo{
@@ -323,7 +347,7 @@ main div h3{
 .tournamentDetailsInfo > div > div:first-child{
   display: flex;
   flex-direction: column;
-  width: 50%;
+  width: 30%;
   height: 100%;
 }
 
@@ -511,7 +535,8 @@ main div h3{
   padding: 0 0 0 5px;
   width: 48%;
 }
- input:focus{
+
+input:focus{
   outline: none ;
   box-shadow: none;
   border: 1px solid rgb(248, 170, 26); /* Puedes ajustar el color y el ancho según tus preferencias */
@@ -562,16 +587,14 @@ main div h3{
   flex-direction: column!important;
   align-items: flex-start !important;
   justify-content: flex-start !important;
-  width: 50%;
+  width: 80%;
 }
 
 .containerBye{
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 5px;
-  margin-top: 8px;
-  height: 20px !important;
+  height: 40px !important;
 }
 
 .containerBye input:first-child{
@@ -605,7 +628,8 @@ main div h3{
 }
 
 .tournamentDetails{
-  height: 130px;
+  height: 130px !important;
+  min-height: 130px !important;
   width: 100%;
   display: flex;
 }
@@ -979,7 +1003,6 @@ input[type="number"]::-webkit-outer-spin-button {
   padding-left: 10px;
   padding-right: 10px;
   color: #fff;
-  overflow: scroll!important;
 }
 
 .finalResults p{

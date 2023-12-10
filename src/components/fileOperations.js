@@ -1,3 +1,5 @@
+import { CreateTournamentToast, EmptyTournamentErrorToast, DeleteTournamentToast, CreateTournamentErrorToast, AddPlayerToast, DeletePlayerToast, AddPlayerErrorToast, AddPlayerError2Toast } from '@/components/toasts'
+
 export const getTournaments = () => {
   const tournaments = localStorage.getItem("tournaments")
   if (tournaments !== null) {
@@ -16,7 +18,7 @@ export const createTournament = (tournamentName) => {
 
   const existeTorneo = arrayTournaments.some((tournament) => tournament.name === tournamentName);
 
-  if (existeTorneo) { } else if (tournamentName === '') { } else {
+  if (existeTorneo) { CreateTournamentErrorToast() } else if (tournamentName === '') { EmptyTournamentErrorToast() } else {
     const newTournament = [{
       name: tournamentName,
       players: [],
@@ -27,6 +29,7 @@ export const createTournament = (tournamentName) => {
       winner: '',
       results: []
     }, ...arrayTournaments];
+    CreateTournamentToast()
     localStorage.setItem("tournaments", JSON.stringify(newTournament));
   }
 };
@@ -171,6 +174,8 @@ export const deleteTournament = (tournament) => {
 
   const newArray = tournaments.filter((t) => t.name !== tournament.name);
 
+  DeleteTournamentToast()
+
   localStorage.setItem("tournaments", JSON.stringify(newArray));
 }
 const generateAutoIncrementalId = (players) => {
@@ -191,14 +196,17 @@ export const addPlayer = (tournament, player) => {
   );
 
   if (existingPlayer) {
+    AddPlayerError2Toast()
     return 0;
   }
 
   if (player.name === '') {
+    AddPlayerErrorToast()
     return 0;
   }
 
   if (player.surname === '') {
+    AddPlayerErrorToast()
     return 0;
   }
 
@@ -226,7 +234,7 @@ export const addPlayer = (tournament, player) => {
           players: objeto.players.concat(newPlayer)
         };
       }
-      return objeto; // Retorna el objeto sin modificar en los otros casos
+      return objeto
     });
 
     // Guarda el nuevo array en el almacenamiento local
@@ -279,8 +287,10 @@ export const deletePlayer = (tournamentName, playerID) => {
     tournament.players = tournament.players.filter(
       (p) => !(p.id === playerID)
     );
-  }
 
+    DeletePlayerToast();
+
+  }
   // Actualiza el array de torneos en el almacenamiento local
   localStorage.setItem("tournaments", JSON.stringify(tournaments));
 };
@@ -323,6 +333,10 @@ export const getAllPlayers = (selectedPlayers) => {
 
 export const getPlayersByTournament = (tournamentName) => {
   const tournaments = getTournaments()
-  const tournament = tournaments.find((t) => t.name === tournamentName.name)
-  return (tournament ? tournament.players : [])
+  if (tournaments) {
+    const tournament = tournaments.find((t) => t.name === tournamentName.name)
+    return (tournament ? tournament.players : [])
+  }
+
+
 }

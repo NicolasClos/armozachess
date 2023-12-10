@@ -14,6 +14,12 @@ import { MdAddCircle } from "react-icons/md";
 
 import { generarEmparejamientosSuizos } from '@/components/pairings'
 
+import { ToastContainer } from "react-toastify";
+
+import { CreateTournamentToast, DeleteTournamentToast, CreateTournamentErrorToast, AddPlayerToast, DeletePlayerToast, AddPlayerErrorToast, AddPlayerError2Toast, StartTournamentErrorToast } from '@/components/toasts'
+
+
+
 const Torneos = () => {
 
   /* STATES */
@@ -21,8 +27,6 @@ const Torneos = () => {
   const [tournaments, setTournaments] = useState([]);
 
   const [players, setPlayers] = useState([])
-
-  const [tournament, setTournament] = useState({})
 
   /* ------ */
 
@@ -52,27 +56,31 @@ const Torneos = () => {
 
   const [updatePlayers, setUpdatePlayers] = useState(false)
 
-  const [showP, setShowP] = useState(false)
-
   /* FUNCTIONS */
 
   const addPlayerToList = (tournament, playerName, playerSurname) => {
     addPlayer(tournament, { name: playerName, surname: playerSurname });
     setTournaments(getTournaments());
     setPlayers(getPlayersByTournament(selectedTournament));
-    setShowP(true)
-    setTimeout(() => {
-      setShowP(false);
-      setInputPlayerName('')
-      setInputPlayerSurname('');
-    }, 1500)
+    setInputPlayerName('')
+    setInputPlayerSurname('');
+    setSelectedTournament({ ...selectedTournament, players: [...selectedTournament.players, { name: playerName, surname: playerSurname }] })
+    updateSelectedTournament(selectedTournament);
   }
 
   const deletePlayerFromList = (player) => {
-    deletePlayer(selectedTournament.name, player.id)
-    setSelectedPlayer({})
-    updateSelectedTournament(selectedTournament);
-  }
+    // Eliminar el jugador de la lista en selectedTournament
+    const updatedPlayers = selectedTournament.players.filter((p) => p.id !== player.id);
+
+    // Actualizar selectedTournament con la nueva lista de jugadores
+    setSelectedTournament({ ...selectedTournament, players: updatedPlayers });
+
+    // Resto de tu lógica...
+    deletePlayer(selectedTournament.name, player.id);
+    setSelectedPlayer({});
+    updateSelectedTournament({ ...selectedTournament, players: updatedPlayers });
+  };
+
 
   const torneoVacio = () => {
     setSelectedTournament({});
@@ -105,23 +113,13 @@ const Torneos = () => {
 
     const claseTerminado = torneo.finished ? 'finishedTournament' : '';
 
-    return `baseClass ${claseSeleccionado} ${claseIniciado} ${claseTerminado}`;
+    const selectedStarted = torneo.started && !torneo.finished && selectedTournament && selectedTournament.name === torneo.name ? 'selectedStartedTournament' : '';
+
+    const selectedFinished = torneo.finished && selectedTournament && selectedTournament.name === torneo.name ? 'selectedFinishedTournament' : '';
+
+    return `baseClass ${claseSeleccionado} ${claseIniciado} ${claseTerminado} ${selectedStarted} ${selectedFinished}`;
   };
 
-  const errorCreatePlayer = () => {
-    const existingPlayer = selectedTournament.players && selectedTournament.players.find(
-      (existingPlayer) =>
-        existingPlayer &&
-        existingPlayer.name &&
-        existingPlayer.surname &&
-        existingPlayer.name.toLowerCase() === inputPlayerName.toLowerCase() &&
-        existingPlayer.surname.toLowerCase() === inputPlayerSurname.toLowerCase()
-    );
-
-    const inputPlayer = existingPlayer || inputPlayerName === '' || inputPlayerSurname === '' ? <p color='colorRed'>O el jugador ya se encuentra en el torneo o no está completando nombre y apellido.</p> : <p className='colorGreen'>Creado correctamente</p>;
-
-    return inputPlayer;
-  };
 
   /* EFFECTS */
 
@@ -202,10 +200,6 @@ const Torneos = () => {
               addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname);
             }}>Agregar</button>
           </div>
-
-          <div className={showP ? 'colorRed' : 'd-none'}>
-            {errorCreatePlayer()}
-          </div>
           <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetailsInfo'}>
             <div>
               <div>
@@ -257,7 +251,7 @@ const Torneos = () => {
                 </label>
               </div>
             </div>
-            {selectedTournament.started && !selectedTournament.finished ?
+            {selectedTournament.started && !selectedTournament.finished && selectedTournament ?
               (<Link
                 href={selectedTournament && `/torneos/${selectedTournament && selectedTournament.name ? selectedTournament.name.toLowerCase() : ''}`
                 }
@@ -271,12 +265,15 @@ const Torneos = () => {
                 }}>
                 IR A TORNEO
               </Link>)
-              : selectedTournament.finished ? '' : <Link
+              : selectedTournament.finished ? '' : selectedTournament.players && selectedTournament.players.length > 0 ? <Link
                 href={selectedTournament &&
                   `/torneos/${selectedTournament && selectedTournament.name ? selectedTournament.name.toLowerCase() : ''}`
                 }
                 className={'startTournament'}
                 onClick={() => {
+                  if (selectedTournament && selectedTournament.players && selectedTournament.players.length === 0) {
+                    return
+                  }
                   setTournaments(tournaments)
                   setSelectedTournament({ ...selectedTournament, byeValue: bye, rounds: roundsArray(rounds), results: players.map(player => { return { ...player, points: 0 } }), players: players.map(player => { return { ...player, points: 0 } }) })
                   updateSelectedTournament({})
@@ -294,7 +291,7 @@ const Torneos = () => {
                   })
                 }}>
                 COMENZAR TORNEO
-              </Link>}
+              </Link> : <></>}
           </div>
         </div>
         <div className='playersResultsContainer'>
@@ -334,6 +331,7 @@ const Torneos = () => {
                     {player.surname ? `${player.surname.charAt(0).toUpperCase()}${player.surname.slice(1).toLowerCase()}` : ''}
                     <span onClick={() => {
                       addExistingPlayer(selectedTournament, selectedAllPlayer)
+                      setSelectedTournament({ ...selectedTournament, players: [...selectedTournament.players, player] })
                       setPlayers(getPlayersByTournament(selectedTournament))
                     }} className={selectedAllPlayer.name !== player.name || selectedAllPlayer.surname !== player.surname ? 'd-none addPlayerButton' : 'addPlayerButton'}><MdAddCircle className='addIcon' /></span></p>
                 )
@@ -343,23 +341,24 @@ const Torneos = () => {
           <div className={selectedTournament.finished ? 'finalResultsContainer' : 'd-none'}>
             <div className='finalResults '>
               <p><span>Jugador</span><span>Puntos</span></p>
-              <ul className='finalResultsScroll overflow-scroll'>
-              {selectedTournament.results &&
-                selectedTournament.results
-                  .slice()
-                  .sort((a, b) => b.points - a.points)
-                  .map((player, index) => (
-                    <li key={index}>
-                      <span>{index + 1}.{`   ${player.name} ${player.surname}`}</span>
-                      <span>{player.points}</span>
-                    </li>
-                  ))}
+              <ul className='finalResultsScroll overflow-y-auto'>
+                {selectedTournament.results &&
+                  selectedTournament.results
+                    .slice()
+                    .sort((a, b) => b.points - a.points)
+                    .map((player, index) => (
+                      <li key={index}>
+                        <span>{index + 1}.{`   ${player.name} ${player.surname}`}</span>
+                        <span>{player.points}</span>
+                      </li>
+                    ))}
               </ul>
-              
+
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   )
 }
