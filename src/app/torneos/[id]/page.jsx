@@ -18,6 +18,8 @@ const Start = () => {
 
   const [previousPairings, setPreviousPairings] = useState([])
 
+  const [finalResults, setFinalResults] = useState([])
+
   const [results, setResults] = useState([])
 
   const handleResult = (index, winner) => {
@@ -181,7 +183,7 @@ const Start = () => {
   };
 
   useEffect(() => {
-    if (tournament && selectedRound && rounds) {
+    if (tournament && tournament.players && selectedRound && rounds) {
       const playerPointsMap = {};
 
       rounds.forEach((round) => {
@@ -204,18 +206,71 @@ const Start = () => {
 
       const resultado = Object.values(playerPointsMap);
 
-      const resultadoFiltrado = resultado.filter(
-        (player) => player.name !== 'BYE'
+      let resultadoFiltrado = resultado.filter((player) => player.name !== 'BYE');
+
+      // Comparar con tournament.players y ajustar los resultados
+      const playersInTournament = tournament.players.map((tournamentPlayer) => tournamentPlayer.name);
+      const playersInResultado = resultadoFiltrado.map((resultPlayer) => resultPlayer.name);
+
+      // Agregar jugadores de tournament.players que no están en resultadoFiltrado
+      tournament.players.forEach((tournamentPlayer) => {
+        if (!playersInResultado.includes(tournamentPlayer.name)) {
+          resultadoFiltrado.push({
+            id: tournamentPlayer.id,
+            name: tournamentPlayer.name,
+            surname: tournamentPlayer.surname,
+            points: 0,
+          });
+        }
+      });
+
+      // Eliminar jugadores de resultadoFiltrado que no están en tournament.players
+      resultadoFiltrado = resultadoFiltrado.filter((resultPlayer) =>
+        playersInTournament.includes(resultPlayer.name)
       );
 
-      setResults(resultadoFiltrado)
+      setResults(resultadoFiltrado);
     }
-  }, [tournament, rounds])
+  }, [tournament, rounds]);
+
 
   useEffect(() => {
     if (tournament && tournament.rounds && tournament.rounds.length > 0) {
       updateSelectedTournament(tournament)
       updateTournaments(tournament)
+    }
+
+    if (tournament && tournament.players && rounds && rounds.length > indexRound + 1) {
+      const nextRound = rounds[indexRound + 1];
+
+      if (nextRound && selectedRound.started && !nextRound.started && !selectedRound.finished) {
+        const updatedPlayers = tournament.players.map((player) => ({
+          ...player,
+          points: 0,
+        }));
+
+        setRounds((prevRounds) =>
+          prevRounds.map((round) =>
+            round.round === nextRound.round
+              ? { ...round, playersRound: updatedPlayers }
+              : round
+          )
+        );
+      }
+    }
+
+    if (tournament && tournament.players) {
+      setFinalResults((prevFinalResults) => {
+        const uniqueResults = [...prevFinalResults];
+
+        results.forEach((result) => {
+          if (result && result.id && !uniqueResults.some((prevResult) => prevResult.id === result.id)) {
+            uniqueResults.push(result);
+          }
+        });
+
+        return new Set(uniqueResults);
+      });
     }
   }, [tournament])
 
@@ -235,21 +290,24 @@ const Start = () => {
     }
   }, []);
 
+  console.log(finalResults)
+
   useEffect(() => {
 
     if (tournament && pairings.length && winners.length) {
       setTournament({ ...tournament, rounds: rounds })
     }
 
-    if (tournament && winners) {
+    if (tournament && winners && pairings && selectedRound && !selectedRound.finished) {
+      const validResults = new Set(['secondPlayer', 'BYE', 'firstPlayer', 'empate']);
+
       const isValid =
         winners.length === pairings.length &&
-        winners.every(result => result !== null && result !== undefined) &&
-        winners[winners.length - 1] === 'BYE';
-
-      const allResultsSelected = winners.every(result => result !== null && result !== undefined);
-
-      setIsNextRoundEnabled(selectedRound.finished || (isValid && allResultsSelected));
+        winners.every((result) => {
+          const isResultValid = result !== null && result !== undefined && validResults.has(result);
+          return isResultValid;
+        });
+      setIsNextRoundEnabled(isValid);
     }
 
     if (winners && winners.length !== 0) {
@@ -260,8 +318,6 @@ const Start = () => {
     // NO TOCAR ACTUALIZA EL ESTADO DE LOS GANADORES
 
   }, [winners])
-
-
 
   useEffect(() => {
 
@@ -328,7 +384,6 @@ const Start = () => {
     }
 
   }, [pairings]);
-
 
   return (
     <>
@@ -413,8 +468,6 @@ const Start = () => {
                   )
                 );
 
-                console.log(previousPairings)
-
                 setPairings(generarEmparejamientosSuizos(results, previousPairings));
 
                 setSelectedRound({ ...nextRound, started: true })
@@ -424,15 +477,18 @@ const Start = () => {
             >
               SIGUIENTE RONDA
             </button>)
-              : selectedRound && selectedRound.isLast ?
-                <button href='/torneos'
+              : selectedRound && selectedRound.isLast && isNextRoundEnabled ?
+                <Link
+                  href="/torneos"
                   onClick={() => {
-                    setTournament({ ...tournament, winner: results[0], finished: true, results: results })
-                    updateSelectedTournament({ ...tournament, rounds: rounds })
-                    updateTournaments({ ...tournament, rounds: rounds })
+                    setTournament({ ...tournament, winner: results[0], finished: true, results: results });
+                    updateSelectedTournament({ ...tournament, rounds: rounds });
+                    updateTournaments({ ...tournament, rounds: rounds });
                   }}
-                  className={!isNextRoundEnabled ? 'nextRoundDisabled' : 'nextRound'}
-                ><Link href='/torneos/'>TERMINAR TORNEO</Link></button> : ''}
+                  className='nextRound'
+                >
+                  TERMINAR TORNEO
+                </Link> : ''}
           </div>
         </div>
         <div className='startedTournamentResults'>
@@ -442,7 +498,7 @@ const Start = () => {
               <span>Puntaje</span>
             </li>
             <div>
-              {results &&
+              {results && finalResults &&
                 results
                   .slice()
                   .sort((a, b) => b.points - a.points)

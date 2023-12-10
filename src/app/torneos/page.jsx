@@ -42,7 +42,7 @@ const Torneos = () => {
 
   const [rounds, setRounds] = useState(6)
 
-  const [bye, setBye] = useState(0.5)
+  const [bye, setBye] = useState(1)
 
   /* ------ */
 
@@ -82,8 +82,6 @@ const Torneos = () => {
   function roundsArray(cantidad) {
     const arrayRounds = Array.from({ length: cantidad }, (_, index) => {
       const isLast = index === cantidad - 1;
-
-
 
       return {
         round: Number(index + 1),
@@ -187,8 +185,8 @@ const Torneos = () => {
         </div>
       </div>
       <div className={Object.keys(selectedTournament).length !== 0 ? 'playersContainer' : 'd-none'}>
-        <div className='addPlayer' >
-          <div className={selectedTournament.started ? 'd-none' : 'addPlayerContainer'}>
+        <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetails'} >
+          <div className={selectedTournament.finished ? 'd-none' : 'addPlayerContainer'}>
             <h4>Agregar Jugador</h4>
             <div className='addPlayerDiv'>
               <div>
@@ -209,7 +207,7 @@ const Torneos = () => {
           <div className={showP ? 'colorRed' : 'd-none'}>
             {errorCreatePlayer()}
           </div>
-          <div className='tournamentDetails'>
+          <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetails'}>
             <div>
               <div>
                 <label>Rondas</label>
@@ -234,7 +232,7 @@ const Torneos = () => {
                   </div>
                 </div>
               </div>
-              <div className={!selectedTournament.started ? 'byeContainer' : 'd-none'}>
+              <div className={!selectedTournament.finished ? 'byeContainer' : 'd-none'}>
                 <p>Editar valor del BYE</p>
                 <label className='containerBye'>
                   0.5
@@ -270,7 +268,7 @@ const Torneos = () => {
                   updateTournamentStarted(selectedTournament, true)
                   setTournaments(tournaments)
                   updateSelectedTournament({})
-                  updateSelectedTournament(selectedTournament)
+                  updateSelectedTournament({ ...selectedTournament, players: players })
                 }}>
                 IR A TORNEO
               </Link>)
@@ -314,7 +312,7 @@ const Torneos = () => {
                     setSelectedAllPlayer({})
                   }} className={selectedPlayer.id == player.id ? 'selectedPlayer' : ''} key={index + 1}>{player.name && typeof player.name === 'string' ? `${player.name.charAt(0).toUpperCase()}${player.name.slice(1).toLowerCase()}` : ''}
                     {' '}
-                    {player.surname && typeof player.surname === 'string' ? `${player.surname.charAt(0).toUpperCase()}${player.surname.slice(1).toLowerCase()}` : ''}<span className={selectedPlayer.id !== player.id || selectedTournament.started ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
+                    {player.surname && typeof player.surname === 'string' ? `${player.surname.charAt(0).toUpperCase()}${player.surname.slice(1).toLowerCase()}` : ''}<span className={selectedPlayer.id !== player.id || selectedTournament.finished ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
                       deletePlayerFromList(player)
                       setUpdatePlayers(!updatePlayers)
                     }}><BsTrash className='trashIcon' /></span></p>
@@ -322,7 +320,7 @@ const Torneos = () => {
               }) : ''}
             </div>
           </div>
-          <div className={selectedTournament.started ? 'd-none playersResults' : 'playersResults'}>
+          <div className={selectedTournament.finished ? 'd-none playersResults' : 'playersResults'}>
             <h3>AGREGADO RAPIDO</h3>
             <div>
               {Object.keys(selectedTournament).length !== 0 ? getAllPlayers(players).filter(

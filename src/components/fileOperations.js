@@ -23,7 +23,7 @@ export const createTournament = (tournamentName) => {
       started: false,
       finished: false,
       rounds: [],
-      byeValue: 0.5,
+      byeValue: 1,
       winner: '',
       results: []
     }, ...arrayTournaments];

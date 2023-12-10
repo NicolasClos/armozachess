@@ -132,8 +132,8 @@ main div h3{
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 20px;
+  justify-content: space-between;
+  padding: 40px;
   max-width: 23%;
 }
 
@@ -268,12 +268,12 @@ main div h3{
 }
 
 .playersContainer{
-  height: 100%;
-  flex-grow:3;
+   height: 100%;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
   justify-content: center;
+  padding: 40px;
 }
 
 .playersResultsContainer{
@@ -311,6 +311,7 @@ main div h3{
   overflow: auto;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .tournamentName{
@@ -475,8 +476,9 @@ main div h3{
 }
 
 .tournamentDetails{
-  height: 100%;
-  width: 48%;
+  height: 130px;
+  width: 100%;
+  background-color: red;
 }
 
 .tournamentDetails > div{
@@ -782,6 +784,9 @@ input[type="number"]::-webkit-outer-spin-button {
   height: 40px;
   cursor: pointer;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .byeButton{
@@ -821,9 +826,13 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .finalResultsContainer{
+  width: 48%;
+  color: #fff;
   background-color: hsla(0, 0%, 13%, 0.8);
-  width: 40%;
-  margin-top: 50px;
+  height: 60vh;
+  margin-top: 50px !important;
+  justify-content: flex-end;
+  margin-right: 20px;
 }
 
 
@@ -833,6 +842,8 @@ input[type="number"]::-webkit-outer-spin-button {
   flex-direction: column;
   width: 100%;
   overflow: auto;
+  
+  overflow-x: scroll;
 }
 
 .finalResults li{
