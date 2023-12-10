@@ -290,7 +290,7 @@ const Start = () => {
     }
   }, []);
 
-  console.log(finalResults)
+  console.log(previousPairings)
 
   useEffect(() => {
 

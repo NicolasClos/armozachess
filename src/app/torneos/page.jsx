@@ -185,29 +185,28 @@ const Torneos = () => {
         </div>
       </div>
       <div className={Object.keys(selectedTournament).length !== 0 ? 'playersContainer' : 'd-none'}>
-        <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetails'} >
+        <div className='tournamentDetails' >
           <div className={selectedTournament.finished ? 'd-none' : 'addPlayerContainer'}>
             <h4>Agregar Jugador</h4>
             <div className='addPlayerDiv'>
-              <div>
-                <input onChange={(e) => {
-                  setInputPlayerName(e.target.value)
-                }}
-                  placeholder='Nombre' type='text' value={inputPlayerName} />
-                <input onChange={(e) => {
-                  setInputPlayerSurname(e.target.value)
-                }}
-                  placeholder='Apellido' value={inputPlayerSurname} type='text' />
-              </div>
-              <button onClick={() => {
-                addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname);
-              }}>Agregar</button>
+              <input onChange={(e) => {
+                setInputPlayerName(e.target.value)
+              }}
+                placeholder='Nombre' type='text' value={inputPlayerName} />
+              <input onChange={(e) => {
+                setInputPlayerSurname(e.target.value)
+              }}
+                placeholder='Apellido' value={inputPlayerSurname} type='text' />
             </div>
+            <button onClick={() => {
+              addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname);
+            }}>Agregar</button>
           </div>
+
           <div className={showP ? 'colorRed' : 'd-none'}>
             {errorCreatePlayer()}
           </div>
-          <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetails'}>
+          <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetailsInfo'}>
             <div>
               <div>
                 <label>Rondas</label>
@@ -237,7 +236,7 @@ const Torneos = () => {
                 <label className='containerBye'>
                   0.5
                   <input
-                    className='w-5 h-5 inputBye'
+                    className='w-4 h-4 inputBye'
                     disabled={selectedTournament.started ? true : false}
                     type="radio"
                     name="byeOption"
@@ -247,7 +246,7 @@ const Torneos = () => {
                   />
                   1
                   <input
-                    className='inputBye'
+                    className='w-4 h-4 inputBye'
                     disabled={selectedTournament.started ? true : false}
                     type="radio"
                     name="byeOption"
@@ -320,7 +319,7 @@ const Torneos = () => {
               }) : ''}
             </div>
           </div>
-          <div className={selectedTournament.finished ? 'd-none playersResults' : 'playersResults'}>
+          <div className={selectedTournament.finished ? 'd-none playersResultsFastAdd' : 'playersResultsFastAdd'}>
             <h3>AGREGADO RAPIDO</h3>
             <div>
               {Object.keys(selectedTournament).length !== 0 ? getAllPlayers(players).filter(
@@ -342,8 +341,9 @@ const Torneos = () => {
             </div>
           </div>
           <div className={selectedTournament.finished ? 'finalResultsContainer' : 'd-none'}>
-            <ul className='finalResults'>
-              <li><span>Jugador</span><span>Puntos</span></li>
+            <div className='finalResults '>
+              <p><span>Jugador</span><span>Puntos</span></p>
+              <ul className='finalResultsScroll overflow-scroll'>
               {selectedTournament.results &&
                 selectedTournament.results
                   .slice()
@@ -354,7 +354,9 @@ const Torneos = () => {
                       <span>{player.points}</span>
                     </li>
                   ))}
-            </ul>
+              </ul>
+              
+            </div>
           </div>
         </div>
       </div>
