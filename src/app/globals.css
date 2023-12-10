@@ -212,6 +212,7 @@ main div h3{
   background-color: hsla(0, 0%, 13%, 0.8) !important;
   height: 60vh;
   margin-top: 50px;
+  overflow-y: auto ;
 }
 
 .baseClass{
