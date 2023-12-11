@@ -303,7 +303,7 @@ const Torneos = () => {
               ).map((player, index) => {
                 return (
                   <p onClick={() => {
-                    setSelectedPlayer(player);
+                    selectedTournament && !selectedTournament.finished ? setSelectedPlayer(player) : ''
                     setToggle(!toggle)
                     setSelectedAllPlayer({})
                   }} className={selectedPlayer.id == player.id ? 'selectedPlayer' : ''} key={index + 1}>{player.name && typeof player.name === 'string' ? `${player.name.charAt(0).toUpperCase()}${player.name.slice(1).toLowerCase()}` : ''}
@@ -333,6 +333,7 @@ const Torneos = () => {
                       addExistingPlayer(selectedTournament, selectedAllPlayer)
                       setSelectedTournament({ ...selectedTournament, players: [...selectedTournament.players, player] })
                       setPlayers(getPlayersByTournament(selectedTournament))
+                      AddPlayerToast()
                     }} className={selectedAllPlayer.name !== player.name || selectedAllPlayer.surname !== player.surname ? 'd-none addPlayerButton' : 'addPlayerButton'}><MdAddCircle className='addIcon' /></span></p>
                 )
               }) : ''}

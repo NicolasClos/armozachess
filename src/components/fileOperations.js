@@ -237,6 +237,7 @@ export const addPlayer = (tournament, player) => {
       return objeto
     });
 
+    AddPlayerToast()
     // Guarda el nuevo array en el almacenamiento local
     localStorage.setItem("tournaments", JSON.stringify(newArray));
   }
