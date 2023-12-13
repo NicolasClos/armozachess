@@ -146,21 +146,21 @@ main div h3{
   height: 130px;
 }
 
+
 .startTournament{
-  background-color: rgba(156, 114, 36, 0.6);
   color: #fff;
-  height: 40px;
+  background-color: hsla(0, 0%, 13%, 0.8);
   cursor: pointer;
-  transition: all 0.3s;
-  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100% !important;
+  height: 40px;
+  width: 100%;
+  transition: all 0.3s;
 }
 
 .startTournament:hover{
-  background-color:rgba(156, 114, 36, 0.5);
+  background-color: rgba(156, 114, 36, 0.6);
 }
 
 .createTournament{
@@ -216,7 +216,6 @@ main div h3{
 }
 
 .baseClass{
-  transition: all 0.3s;
   border-top: none !important;
   border-right: none !important;
   border-left: none !important;
@@ -247,7 +246,7 @@ main div h3{
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 15px 10px 15px;
+  width: 50px;
   font-size: 20px;
   background-color: rgba(128, 0, 0, 0.5);
 }
@@ -465,8 +464,19 @@ main div h3{
   border-bottom: 1px solid rgb(248, 170, 26) !important;
 }
 
+.playersContainer h3 span:last-child{
+  background-color: rgba(248, 170, 26, 0.4);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  width: 50px;
+  justify-content: center;
+  position: absolute;
+  right: 0 !important;
+  border: 1px solid rgba(248, 170, 26, 0.4); ;
+}
+
 .playersResults p{
-  transition: all 0.3s;
   border-bottom: 1px solid rgba(202, 202, 202, 0.5);
   cursor: pointer;
   height: 40px;
@@ -526,8 +536,7 @@ main div h3{
   transition: all 0.3s;
 }
 
-
-.addPlayerContainer button{
+.addPlayerContainer button:hover{
   background-color: rgba(156, 114, 36, 0.6);
 }
 

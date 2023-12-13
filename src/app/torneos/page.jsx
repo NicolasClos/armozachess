@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import Link from 'next/link'
 
@@ -120,6 +120,27 @@ const Torneos = () => {
     return `baseClass ${claseSeleccionado} ${claseIniciado} ${claseTerminado} ${selectedStarted} ${selectedFinished}`;
   };
 
+  // TABS ADD PLAYER
+
+  const inputRefs = [useRef(), useRef(), useRef()];
+
+  const manejarKeyDown = (event, inputIndex) => {
+    const nextInputIndex = (inputIndex + 1) % 3;
+
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      if (nextInputIndex === 0) {
+        inputRefs[0].current.focus();
+      } else {
+        inputRefs[nextInputIndex].current.focus();
+      }
+    } else if (inputIndex === 2 && event.key === 'Enter') {
+      addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname);
+      inputRefs[nextInputIndex].current.focus();
+      setInputPlayerName('')
+      setInputPlayerSurname('')
+    }
+  };
 
   /* EFFECTS */
 
@@ -144,6 +165,8 @@ const Torneos = () => {
   useEffect(() => {
     updateTournamentByeValue(selectedTournament, bye)
   }, [bye, rounds])
+
+
 
   return (
     <div className='tournaments'>
@@ -190,15 +213,24 @@ const Torneos = () => {
               <input onChange={(e) => {
                 setInputPlayerName(e.target.value)
               }}
-                placeholder='Nombre' type='text' value={inputPlayerName} />
+                placeholder='Nombre' type='text' value={inputPlayerName}
+                id="input1"
+                ref={inputRefs[0]}
+                onKeyDown={(event) => manejarKeyDown(event, 0)} />
               <input onChange={(e) => {
                 setInputPlayerSurname(e.target.value)
               }}
-                placeholder='Apellido' value={inputPlayerSurname} type='text' />
+                placeholder='Apellido' value={inputPlayerSurname} type='text'
+                id="input2"
+                ref={inputRefs[1]}
+                onKeyDown={(event) => manejarKeyDown(event, 1)} />
             </div>
             <button onClick={() => {
               addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname);
-            }}>Agregar</button>
+            }}
+              id="input3"
+              ref={inputRefs[2]}
+              onKeyDown={(event) => manejarKeyDown(event, 2)}>Agregar</button>
           </div>
           <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetailsInfo'}>
             <div>
@@ -247,6 +279,7 @@ const Torneos = () => {
                     value="1"
                     checked={bye === 1}
                     onChange={(e) => setBye(parseFloat(e.target.value))}
+
                   />
                 </label>
               </div>
@@ -296,7 +329,7 @@ const Torneos = () => {
         </div>
         <div className='playersResultsContainer'>
           <div className='playersResults'>
-            <h3>Jugadores del torneo:<span className='tournamentName'>&nbsp;{selectedTournament.name}</span></h3>
+            <h3>Jugadores del torneo:<span className='tournamentName'>&nbsp;{selectedTournament.name}</span><span>{selectedTournament && selectedTournament.players && selectedTournament.players.length}</span></h3>
             <div>
               {players && Object.keys(selectedTournament).length !== 0 ? players.filter(
                 (player) => player.name !== 'BYE'
@@ -359,7 +392,19 @@ const Torneos = () => {
           </div>
         </div>
       </div>
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        limit={2}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   )
 }
