@@ -329,7 +329,7 @@ const Torneos = () => {
         </div>
         <div className='playersResultsContainer'>
           <div className='playersResults'>
-            <h3>Jugadores del torneo:<span className='tournamentName'>&nbsp;{selectedTournament.name}</span><span>{selectedTournament && selectedTournament.players && selectedTournament.players.length}</span></h3>
+            <h3>Jugadores del torneo:<span className='tournamentName'>&nbsp;{selectedTournament.name}</span><span>{selectedTournament && selectedTournament.players && players && players.length}</span></h3>
             <div>
               {players && Object.keys(selectedTournament).length !== 0 ? players.filter(
                 (player) => player.name !== 'BYE'
