@@ -319,6 +319,7 @@ main div h3{
 
 .selectedStartedTournament{
   border: 1px solid rgb(23, 77, 23) !important;
+  background-color: rgba(0, 128, 0, 0.6);
 }
 
 .playersResults{

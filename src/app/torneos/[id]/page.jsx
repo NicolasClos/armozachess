@@ -274,6 +274,8 @@ const Start = () => {
     }
   }, [tournament])
 
+  console.log(finalResults)
+
   useEffect(() => {
     const selectedTournament = getSelectedTournament();
     setTournament({ ...selectedTournament, started: true });
