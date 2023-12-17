@@ -3,6 +3,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 
 export const CreateTournamentToast = () => {
+    toast.dismiss()
     toast.success("¡Torneo creado correctamente!", {
         position: "top-right",
         autoClose: 2000,
@@ -13,9 +14,11 @@ export const CreateTournamentToast = () => {
         progress: false,
         theme: "dark",
     });
+    toast.dismiss()
 };
 
 export const DeleteTournamentToast = () => {
+    toast.dismiss()
     toast.success("¡Torneo eliminado correctamente!", {
         position: "top-right",
         autoClose: 2000,
@@ -26,9 +29,11 @@ export const DeleteTournamentToast = () => {
         progress: false,
         theme: "dark",
     });
+    toast.dismiss()
 };
 
 export const CreateTournamentErrorToast = () => {
+    toast.dismiss()
     toast.error("¡Ya existe un torneo con mismo nombre!", {
         position: "top-right",
         autoClose: 2000,
@@ -42,6 +47,7 @@ export const CreateTournamentErrorToast = () => {
 };
 
 export const EmptyTournamentErrorToast = () => {
+    toast.dismiss()
     toast.error("¡Ya existe un torneo con mismo nombre!", {
         position: "top-right",
         autoClose: 2000,
@@ -55,6 +61,7 @@ export const EmptyTournamentErrorToast = () => {
 };
 
 export const AddPlayerToast = () => {
+    toast.dismiss()
     toast.success("¡Jugador agregado correctamente!", {
         position: "top-right",
         autoClose: 2000,
@@ -68,6 +75,7 @@ export const AddPlayerToast = () => {
 };
 
 export const DeletePlayerToast = () => {
+    toast.dismiss()
     toast.success("¡Jugador eliminado correctamente!", {
         position: "top-right",
         autoClose: 2000,
@@ -81,6 +89,7 @@ export const DeletePlayerToast = () => {
 };
 
 export const AddPlayerErrorToast = () => {
+    toast.dismiss()
     toast.error("¡Debe escribir tanto 'Nombre' como 'Apellido'!", {
         position: "top-right",
         autoClose: 2000,
@@ -94,6 +103,7 @@ export const AddPlayerErrorToast = () => {
 };
 
 export const AddPlayerError2Toast = () => {
+    toast.dismiss()
     toast.error("¡Ya existe un jugador con este nombre!", {
         position: "top-right",
         autoClose: 2000,
@@ -107,6 +117,7 @@ export const AddPlayerError2Toast = () => {
 };
 
 export const StartTournamentErrorToast = () => {
+    toast.dismiss()
     toast.error("¡No puede empezar un jugador sin ningún jugador!", {
         position: "top-right",
         autoClose: 2000,

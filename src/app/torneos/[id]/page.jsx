@@ -177,43 +177,21 @@ const Start = () => {
     setWinners([])
   }
 
-  function ordenarPairings(currentPairings) {
-    // Contar la cantidad de veces que cada jugador ha jugado como firstPlayer o secondPlayer
-    const countMap = new Map();
+  function formatFullname(nombre, apellido) {
+    if (!nombre || !apellido) {
+      return "BYE";
+    }
 
-    // Función para contar la frecuencia de cada jugador
-    const contarFrecuencia = jugador => {
-      const key = `${jugador.id}-${jugador.name}-${jugador.surname}`;
-      countMap.set(key, (countMap.get(key) || 0) + 1);
-    };
+    const nombreFormateado = nombre
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
 
-    // Contar la frecuencia en los pairings previos
-    previousPairings.forEach(pairing => {
-      contarFrecuencia(pairing.firstPlayer);
-      contarFrecuencia(pairing.secondPlayer);
-    });
+    const apellidoFormateado = apellido.charAt(0).toUpperCase() + apellido.slice(1).toLowerCase();
 
-    // Contar la frecuencia en los pairings actuales
-    currentPairings.forEach(pairing => {
-      contarFrecuencia(pairing.firstPlayer);
-      contarFrecuencia(pairing.secondPlayer);
-    });
+    const nombreCompletoFormateado = `${nombreFormateado} ${apellidoFormateado}`;
 
-    // Función para comparar la frecuencia de dos jugadores
-    const compararFrecuencia = (jugadorA, jugadorB) => {
-      const keyA = `${jugadorA.id}-${jugadorA.name}-${jugadorA.surname}`;
-      const keyB = `${jugadorB.id}-${jugadorB.name}-${jugadorB.surname}`;
-      return countMap.get(keyB) - countMap.get(keyA);
-    };
-
-    // Ordenar los pairings actuales según la frecuencia de los jugadores
-    const pairingsOrdenados = currentPairings.sort((a, b) => {
-      const comparacionFirst = compararFrecuencia(a.firstPlayer, b.firstPlayer);
-      const comparacionSecond = compararFrecuencia(a.secondPlayer, b.secondPlayer);
-      return comparacionFirst || comparacionSecond;
-    });
-
-    return pairingsOrdenados;
+    return nombreCompletoFormateado;
   }
 
   function resetPairingPoints(pairings) {
@@ -286,13 +264,13 @@ const Start = () => {
 
       setFinalResults(resultadoFiltrado)
 
-      // Comparar con tournament.players y ajustar los resultados
-      const playersInTournament = tournament.players.map((tournamentPlayer) => tournamentPlayer.name);
-      const playersInResultado = resultadoFiltrado.map((resultPlayer) => resultPlayer.name);
+      // Comparar con tournament.players y ajustar los resultados por player.id
+      const playersInTournament = tournament.players.map((tournamentPlayer) => tournamentPlayer.id);
+      const playersInResultado = resultadoFiltrado.map((resultPlayer) => resultPlayer.id);
 
-      // Agregar jugadores de tournament.players que no están en resultadoFiltrado
+      // Agregar jugadores de tournament.players que no están en resultadoFiltrado por player.id
       tournament.players.forEach((tournamentPlayer) => {
-        if (!playersInResultado.includes(tournamentPlayer.name)) {
+        if (!playersInResultado.includes(tournamentPlayer.id)) {
           resultadoFiltrado.push({
             id: tournamentPlayer.id,
             name: tournamentPlayer.name,
@@ -302,9 +280,9 @@ const Start = () => {
         }
       });
 
-      // Eliminar jugadores de resultadoFiltrado que no están en tournament.players
+      // Eliminar jugadores de resultadoFiltrado que no están en tournament.players por player.id
       resultadoFiltrado = resultadoFiltrado.filter((resultPlayer) =>
-        playersInTournament.includes(resultPlayer.name)
+        playersInTournament.includes(resultPlayer.id)
       );
 
       setResults(resultadoFiltrado);
@@ -459,7 +437,7 @@ const Start = () => {
   }, [togglePairing])
 
   useEffect(() => {
-    if (tournament && tournament.players) {
+    if (tournament && tournament.players && pairings) {
       let playersOne = tournament.players.length
       if (playersOne && Number(playersOne) % 2 !== 0) {
         playersOne++
@@ -467,7 +445,7 @@ const Start = () => {
 
       let iterations = 0; // Agrega esta variable para evitar bucles infinitos
 
-      while (tournament && tournament.players && playersOne / 2 !== pairings.length && iterations < 10) {
+      while (tournament && tournament.players && playersOne / 2 !== pairings.length && iterations < 11125) {
         rePair();
         console.log("SE EJECUTO");
         iterations++;
@@ -513,7 +491,7 @@ const Start = () => {
                 <div key={index} className='pairingsDivLiContainer'><span>{index + 1}</span><li >
                   {pairing.firstPlayer && pairing.secondPlayer && (
                     <>
-                      <span>{`${pairing.firstPlayer.name} ${pairing.firstPlayer.surname}`}</span>
+                      <span>{pairing && pairing.firstPlayer && pairing.firstPlayer.name && pairing.firstPlayer.surname ? formatFullname(pairing.firstPlayer.name, pairing.firstPlayer.surname) : ''}</span>
                       <span>
                         {pairing.secondPlayer.name !== 'BYE' ? <><button
                           onClick={() => {
@@ -538,7 +516,7 @@ const Start = () => {
                           </button>
                         </> : <button onClick={() => handleResult(index, 'BYE')} disabled={selectedRound.finished} className={winners[index] === 'BYE' ? "selectedBye" : "byeButton"}>BYE</button>}
                       </span>
-                      <span>{`${pairing.secondPlayer.name} ${pairing.secondPlayer.surname ? pairing.secondPlayer.surname : ''}`}</span>
+                      <span>{formatFullname(pairing.secondPlayer.name, pairing.secondPlayer.surname)}</span>
                     </>
                   )}
                 </li>
@@ -601,7 +579,7 @@ const Start = () => {
                   .sort((a, b) => b.points - a.points)
                   .map((player, index) => (
                     <li key={index}>
-                      <span><span>{index + 1}.  </span>{`${player.name} ${player.surname}`}</span>
+                      <span><span className='tournamentResultsPositions'>{index + 1}</span>{formatFullname(player.name, player.surname)}</span>
                       <span>{player.points}</span>
                     </li>
                   ))}

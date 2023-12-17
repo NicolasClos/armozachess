@@ -14,11 +14,26 @@ import { MdAddCircle } from "react-icons/md";
 
 import { generarEmparejamientosSuizos } from '@/components/pairings'
 
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 import { CreateTournamentToast, DeleteTournamentToast, CreateTournamentErrorToast, AddPlayerToast, DeletePlayerToast, AddPlayerErrorToast, AddPlayerError2Toast, StartTournamentErrorToast } from '@/components/toasts'
 
+function formatFullname(nombre, apellido) {
+  if (!nombre || !apellido) {
+    return "Nombre y apellido son obligatorios.";
+  }
 
+  const nombreFormateado = nombre
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
+  const apellidoFormateado = apellido.charAt(0).toUpperCase() + apellido.slice(1).toLowerCase();
+
+  const nombreCompletoFormateado = `${nombreFormateado} ${apellidoFormateado}`;
+
+  return nombreCompletoFormateado;
+}
 
 const Torneos = () => {
 
@@ -335,18 +350,16 @@ const Torneos = () => {
             <div>
               {players && Object.keys(selectedTournament).length !== 0 ? players.filter(
                 (player) => player.name !== 'BYE'
-              ).map((player, index) => {
+              ).reverse().map((player, index) => {
                 return (
                   <p onClick={() => {
                     selectedTournament && !selectedTournament.finished ? setSelectedPlayer(player) : ''
                     setToggle(!toggle)
                     setSelectedAllPlayer({})
-                  }} className={selectedPlayer.id == player.id ? 'selectedPlayer' : ''} key={index + 1}>{player.name && typeof player.name === 'string' ? `${player.name.charAt(0).toUpperCase()}${player.name.slice(1).toLowerCase()}` : ''}
-                    {' '}
-                    {player.surname && typeof player.surname === 'string' ? `${player.surname.charAt(0).toUpperCase()}${player.surname.slice(1).toLowerCase()}` : ''}<span className={selectedPlayer.id !== player.id || selectedTournament.finished ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
-                      deletePlayerFromList(player)
-                      setUpdatePlayers(!updatePlayers)
-                    }}><BsTrash className='trashIcon' /></span></p>
+                  }} className={selectedPlayer.id == player.id ? 'selectedPlayer' : ''} key={index + 1}>{player.name && typeof player.name === 'string' && player.surname && typeof player.surname === 'string' ? formatFullname(player.name, player.surname) : ''}<span className={selectedPlayer.id !== player.id || selectedTournament.finished ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
+                    deletePlayerFromList(player)
+                    setUpdatePlayers(!updatePlayers)
+                  }}><BsTrash className='trashIcon' /></span></p>
                 )
               }) : ''}
             </div>
