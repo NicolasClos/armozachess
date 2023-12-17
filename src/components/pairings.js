@@ -137,25 +137,34 @@ export function generarEmparejamientosSuizos(roundPlayers, prevPairings) {
       }
     });
 
-    function ajustarOrdenBye(pairings) {
-      return pairings.map((emparejamiento) => {
-        const { firstPlayer, secondPlayer } = emparejamiento;
+    pairings = pairings.map((emparejamiento) => {
+      const { firstPlayer, secondPlayer } = emparejamiento;
 
-        // Verificar si BYE está involucrado y ajustar el orden
-        if (firstPlayer.id === 'BYE') {
-          return {
-            firstPlayer: secondPlayer,
-            secondPlayer: firstPlayer,
-          };
-        } else if (secondPlayer.id === 'BYE') {
-          return emparejamiento; // No es necesario cambiar el orden si BYE es el segundo jugador
-        } else {
-          return emparejamiento; // Mantener el orden original si BYE no está involucrado
-        }
-      });
+      // Verificar si BYE está involucrado y ajustar el orden
+      if (firstPlayer.id === 'BYE') {
+        return {
+          firstPlayer: secondPlayer,
+          secondPlayer: firstPlayer,
+        };
+      } else if (secondPlayer.id === 'BYE') {
+        return emparejamiento; // No es necesario cambiar el orden si BYE es el segundo jugador
+      } else {
+        return emparejamiento; // Mantener el orden original si BYE no está involucrado
+      }
+    });
+
+    function comparePairings(a, b) {
+      // Mueve los pairings con secondPlayer.id igual a 'BYE' al final
+      if (a.secondPlayer.id === 'BYE') {
+        return 1; // a va después de b
+      } else if (b.secondPlayer.id === 'BYE') {
+        return -1; // a va antes de b
+      } else {
+        return 0; // no hay cambio en la posición
+      }
     }
 
-    return ajustarOrdenBye(pairings);
+    return pairings.sort(comparePairings);
 
   }
 }

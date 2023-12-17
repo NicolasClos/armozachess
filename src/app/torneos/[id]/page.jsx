@@ -20,7 +20,6 @@ const Start = () => {
   const [isNextRoundEnabled, setIsNextRoundEnabled] = useState(false);
   const [togglePairing, setTogglePairing] = useState(false);
 
-
   const handleResult = (index, winner) => {
     setWinners((prevWinners) => {
       const updatedWinners = [...prevWinners];
@@ -167,6 +166,16 @@ const Start = () => {
       return updatedWinners;
     });
   };
+
+  const rePair = () => {
+    const prevPairings = rounds
+      .filter(round => round.round !== selectedRound.round)
+      .flatMap(round => round.pairings);
+    setTogglePairing(!togglePairing)
+    setPairings([])
+    setPairings(generarEmparejamientosSuizos(results, prevPairings))
+    setWinners([])
+  }
 
   function ordenarPairings(currentPairings) {
     // Contar la cantidad de veces que cada jugador ha jugado como firstPlayer o secondPlayer
@@ -327,19 +336,6 @@ const Start = () => {
       }
     }
 
-    if (tournament && tournament.players) {
-      setFinalResults((prevFinalResults) => {
-        const uniqueResults = [...prevFinalResults];
-
-        results.forEach((result) => {
-          if (result && result.id && !uniqueResults.some((prevResult) => prevResult.id === result.id)) {
-            uniqueResults.push(result);
-          }
-        });
-
-        return new Set(uniqueResults);
-      });
-    }
   }, [tournament])
 
   useEffect(() => {
@@ -457,10 +453,27 @@ const Start = () => {
             : round
         ))
       }
-
-
     }
+
+
   }, [togglePairing])
+
+  useEffect(() => {
+    if (tournament && tournament.players) {
+      let playersOne = tournament.players.length
+      if (playersOne && Number(playersOne) % 2 !== 0) {
+        playersOne++
+      }
+
+      let iterations = 0; // Agrega esta variable para evitar bucles infinitos
+
+      while (tournament && tournament.players && playersOne / 2 !== pairings.length && iterations < 10) {
+        rePair();
+        console.log("SE EJECUTO");
+        iterations++;
+      }
+    }
+  }, [pairings])
 
   return (
     <>
@@ -486,17 +499,11 @@ const Start = () => {
               ))}
           </div>
           <button
-            className={selectedRound && !selectedRound.finished ? 'buttonReemparejar' : 'd-none'}
+            className={selectedRound && !selectedRound.finished && selectedRound.started ? 'buttonReemparejar' : 'd-none'}
             onClick={() => {
-              const prevPairings = rounds
-                .filter(round => round.round !== selectedRound.round)
-                .flatMap(round => round.pairings);
-              setTogglePairing(!togglePairing)
-              setPairings([])
-              setPairings(generarEmparejamientosSuizos(results, prevPairings))
-              setWinners([])
+              rePair();
             }}
-            disabled={selectedRound && selectedRound.finished}
+            disabled={selectedRound && selectedRound.finished && !selectedRound.started}
           >REEMPAREJAR</button>
         </div>
         <div className='startedTournamentPairing'>
@@ -571,7 +578,7 @@ const Start = () => {
                 <Link
                   href="/torneos"
                   onClick={() => {
-                    setTournament({ ...tournament, winner: results[0], finished: true, results: results });
+                    setTournament({ ...tournament, winner: results[0], finished: true, results: finalResults });
                     updateSelectedTournament({ ...tournament, rounds: rounds });
                     updateTournaments({ ...tournament, rounds: rounds });
                   }}
@@ -589,13 +596,12 @@ const Start = () => {
             </li>
             <div>
               {results && finalResults &&
-                results
+                finalResults
                   .slice()
                   .sort((a, b) => b.points - a.points)
                   .map((player, index) => (
                     <li key={index}>
-
-                      <span><span>{index + 1}.  </span>        {`   ${player.name} ${player.surname}`}</span>
+                      <span><span>{index + 1}.  </span>{`${player.name} ${player.surname}`}</span>
                       <span>{player.points}</span>
                     </li>
                   ))}

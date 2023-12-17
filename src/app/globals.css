@@ -269,7 +269,6 @@ main div h3{
 
 .selectedTournament{
   background-color: rgba(156, 114, 36, 0.6);
-  border: 1px solid rgb(248, 170, 26) !important;
 }
 
 .selectedPlayer{
@@ -314,12 +313,11 @@ main div h3{
 }
 
 .selectedFinishedTournament{
-  border: 1px solid rgb(88, 27, 27) !important;
+  background-color: rgba(128, 0, 0, 0.3)!important;
 }
 
 .selectedStartedTournament{
-  border: 1px solid rgb(23, 77, 23) !important;
-  background-color: rgba(0, 128, 0, 0.6);
+  background-color: rgba(0, 128, 0, 0.3);
 }
 
 .playersResults{
