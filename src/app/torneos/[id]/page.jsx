@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { getSelectedTournament, updateAllTournaments, updateSelectedTournament, updateTournaments } from '@/components/fileOperations';
+import { getSelectedTournament, updateSelectedTournament, updateTournaments } from '@/components/fileOperations';
 import { FaChessPawn } from "react-icons/fa";
 import { generarEmparejamientosSuizos } from '@/components/pairings';
 
@@ -13,14 +13,13 @@ const Start = () => {
   const [rounds, setRounds] = useState([]);
   const [pairings, setPairings] = useState([]);
   const [winners, setWinners] = useState([]);
+  const [previousPairings, setPreviousPairings] = useState([])
+  const [finalResults, setFinalResults] = useState([])
+  const [results, setResults] = useState([])
   const [indexRound, setIndexRound] = useState(0)
   const [isNextRoundEnabled, setIsNextRoundEnabled] = useState(false);
+  const [togglePairing, setTogglePairing] = useState(false);
 
-  const [previousPairings, setPreviousPairings] = useState([])
-
-  const [finalResults, setFinalResults] = useState([])
-
-  const [results, setResults] = useState([])
 
   const handleResult = (index, winner) => {
     setWinners((prevWinners) => {
@@ -169,6 +168,59 @@ const Start = () => {
     });
   };
 
+  function ordenarPairings(currentPairings) {
+    // Contar la cantidad de veces que cada jugador ha jugado como firstPlayer o secondPlayer
+    const countMap = new Map();
+
+    // Función para contar la frecuencia de cada jugador
+    const contarFrecuencia = jugador => {
+      const key = `${jugador.id}-${jugador.name}-${jugador.surname}`;
+      countMap.set(key, (countMap.get(key) || 0) + 1);
+    };
+
+    // Contar la frecuencia en los pairings previos
+    previousPairings.forEach(pairing => {
+      contarFrecuencia(pairing.firstPlayer);
+      contarFrecuencia(pairing.secondPlayer);
+    });
+
+    // Contar la frecuencia en los pairings actuales
+    currentPairings.forEach(pairing => {
+      contarFrecuencia(pairing.firstPlayer);
+      contarFrecuencia(pairing.secondPlayer);
+    });
+
+    // Función para comparar la frecuencia de dos jugadores
+    const compararFrecuencia = (jugadorA, jugadorB) => {
+      const keyA = `${jugadorA.id}-${jugadorA.name}-${jugadorA.surname}`;
+      const keyB = `${jugadorB.id}-${jugadorB.name}-${jugadorB.surname}`;
+      return countMap.get(keyB) - countMap.get(keyA);
+    };
+
+    // Ordenar los pairings actuales según la frecuencia de los jugadores
+    const pairingsOrdenados = currentPairings.sort((a, b) => {
+      const comparacionFirst = compararFrecuencia(a.firstPlayer, b.firstPlayer);
+      const comparacionSecond = compararFrecuencia(a.secondPlayer, b.secondPlayer);
+      return comparacionFirst || comparacionSecond;
+    });
+
+    return pairingsOrdenados;
+  }
+
+  function resetPairingPoints(pairings) {
+    if (!Array.isArray(pairings)) {
+      console.error('El parámetro no es un array de pairings válido.');
+      return;
+    }
+
+    const pairingsConPuntosReseteados = pairings.map(pairing => ({
+      firstPlayer: { ...pairing.firstPlayer, points: 0 },
+      secondPlayer: { ...pairing.secondPlayer, points: 0 },
+    }));
+
+    return pairingsConPuntosReseteados;
+  }
+
   const obtenerIndiceRonda = (rondaActual) => {
     // Verifica que la ronda actual y su propiedad 'round' estén definidas
     if (rondaActual && rondaActual.round !== undefined) {
@@ -181,6 +233,22 @@ const Start = () => {
     // Retorna null si la ronda actual no está definida o no tiene la propiedad 'round'
     return null;
   };
+
+  useEffect(() => {
+    const selectedTournament = getSelectedTournament();
+    setTournament({ ...selectedTournament, started: true });
+    setRounds(selectedTournament.rounds);
+    setSelectedRound(selectedTournament.rounds && selectedTournament.rounds[0]);
+
+    if (results.length > 0) {
+      const resultadoFiltrado = resultado.filter(
+        (player) => player.name !== 'BYE'
+      );
+
+      updateSelectedTournament({ ...tournament, players: resultadoFiltrado })
+      updateTournaments(tournament)
+    }
+  }, []);
 
   useEffect(() => {
     if (tournament && tournament.players && selectedRound && rounds) {
@@ -208,6 +276,8 @@ const Start = () => {
 
       let resultadoFiltrado = resultado.filter((player) => player.name !== 'BYE');
 
+      setFinalResults(resultadoFiltrado)
+
       // Comparar con tournament.players y ajustar los resultados
       const playersInTournament = tournament.players.map((tournamentPlayer) => tournamentPlayer.name);
       const playersInResultado = resultadoFiltrado.map((resultPlayer) => resultPlayer.name);
@@ -232,7 +302,6 @@ const Start = () => {
       setResults(resultadoFiltrado);
     }
   }, [tournament, rounds]);
-
 
   useEffect(() => {
     if (tournament && tournament.rounds && tournament.rounds.length > 0) {
@@ -274,51 +343,6 @@ const Start = () => {
     }
   }, [tournament])
 
-  console.log(finalResults)
-
-  useEffect(() => {
-    const selectedTournament = getSelectedTournament();
-    setTournament({ ...selectedTournament, started: true });
-    setRounds(selectedTournament.rounds);
-    setSelectedRound(selectedTournament.rounds && selectedTournament.rounds[0]);
-
-    if (results.length > 0) {
-      const resultadoFiltrado = resultado.filter(
-        (player) => player.name !== 'BYE'
-      );
-
-      updateSelectedTournament({ ...tournament, players: resultadoFiltrado })
-      updateTournaments(tournament)
-    }
-  }, []);
-
-  useEffect(() => {
-
-    if (tournament && pairings.length && winners.length) {
-      setTournament({ ...tournament, rounds: rounds })
-    }
-
-    if (tournament && winners && pairings && selectedRound && !selectedRound.finished) {
-      const validResults = new Set(['secondPlayer', 'BYE', 'firstPlayer', 'empate']);
-
-      const isValid =
-        winners.length === pairings.length &&
-        winners.every((result) => {
-          const isResultValid = result !== null && result !== undefined && validResults.has(result);
-          return isResultValid;
-        });
-      setIsNextRoundEnabled(isValid);
-    }
-
-    if (winners && winners.length !== 0) {
-      updateSelectedTournament(tournament)
-    }
-
-    updateTournaments(tournament);
-    // NO TOCAR ACTUALIZA EL ESTADO DE LOS GANADORES
-
-  }, [winners])
-
   useEffect(() => {
 
     setIndexRound(obtenerIndiceRonda(selectedRound));
@@ -350,6 +374,33 @@ const Start = () => {
 
   useEffect(() => {
 
+    if (tournament && pairings.length && winners.length) {
+      setTournament({ ...tournament, rounds: rounds })
+    }
+
+    if (tournament && winners && pairings && selectedRound && !selectedRound.finished) {
+      const validResults = new Set(['secondPlayer', 'BYE', 'firstPlayer', 'empate']);
+
+      const isValid =
+        winners.length === pairings.length &&
+        winners.every((result) => {
+          const isResultValid = result !== null && result !== undefined && validResults.has(result);
+          return isResultValid;
+        });
+      setIsNextRoundEnabled(isValid);
+    }
+
+    if (winners && winners.length !== 0) {
+      updateSelectedTournament(tournament)
+    }
+
+    updateTournaments(tournament);
+    // NO TOCAR ACTUALIZA EL ESTADO DE LOS GANADORES
+
+  }, [winners])
+
+  useEffect(() => {
+
     if (tournament && selectedRound && Object.keys(selectedRound).length !== 0) {
       const roundIndex = tournament.rounds.findIndex((round) => round.round === selectedRound.round);
 
@@ -372,18 +423,47 @@ const Start = () => {
       }
     }
 
-    let prevPairings = [];
+    if (rounds && rounds.length > 0) {
+      // Utiliza flatMap para obtener todos los pairings de cada ronda en un solo arreglo
+      const prevPairings = rounds.flatMap(round => round.pairings);
 
-    if (pairings && pairings.length > 0) {
-
-      prevPairings = rounds.map(round => {
-        return round.pairings
-      }).flat()
-
+      // Establece prevPairings en el estado (usando setPreviousPairings)
       setPreviousPairings(prevPairings);
     }
 
-  }, [pairings]);
+  }, [pairings, winners]);
+
+  useEffect(() => {
+    if (selectedRound && selectedRound.playersRound && tournament && tournament.players) {
+      setSelectedRound({
+        ...selectedRound,
+        winners: [],
+        pairings: resetPairingPoints(pairings),
+        playersRound: tournament.players.map(player => {
+          return { ...player, points: 0 }
+        })
+      });
+
+      if (selectedRound && selectedRound.playersRound && tournament && tournament.players) {
+        setRounds(rounds.map((round) =>
+          round.round === selectedRound.round
+            ? {
+              ...selectedRound,
+              winners: [],
+              pairings: resetPairingPoints(pairings),
+              playersRound: tournament.players.map(player => {
+                return { ...player, points: 0 }
+              })
+            } // Actualiza solo la ronda seleccionada
+            : round
+        ))
+      }
+
+
+    }
+  }, [togglePairing])
+
+  console.log(tournament)
 
   return (
     <>
@@ -408,13 +488,23 @@ const Start = () => {
                 </div>
               ))}
           </div>
+          <button
+            className={selectedRound && !selectedRound.finished ? 'buttonReemparejar' : 'd-none'}
+            onClick={() => {
+              setTogglePairing(!togglePairing)
+              setPairings([])
+              setPairings(generarEmparejamientosSuizos(results, previousPairings))
+              setWinners([])
+            }}
+            disabled={selectedRound && selectedRound.finished}
+          >REEMPAREJAR</button>
         </div>
         <div className='startedTournamentPairing'>
           <div className='pairingContainer'>
             <h2>EMPAREJAMIENTO - RONDA </h2>
             <ul>
               {pairings && pairings.map((pairing, index) => (
-                <li key={index}>
+                <div key={index} className='pairingsDivLiContainer'><span>{index + 1}</span><li >
                   {pairing.firstPlayer && pairing.secondPlayer && (
                     <>
                       <span>{`${pairing.firstPlayer.name} ${pairing.firstPlayer.surname}`}</span>
@@ -446,6 +536,7 @@ const Start = () => {
                     </>
                   )}
                 </li>
+                </div>
               ))}
             </ul>
             {selectedRound && !selectedRound.finished && !selectedRound.isLast ? (<button
@@ -468,12 +559,12 @@ const Start = () => {
                   )
                 );
 
-                setPairings(generarEmparejamientosSuizos(results, previousPairings));
-
+                setPairings(generarEmparejamientosSuizos(results, previousPairings))
                 setSelectedRound({ ...nextRound, started: true })
+                updateSelectedTournament({ ...tournament, rounds: rounds })
+                updateTournaments({ ...tournament, rounds: rounds })
               }}
               disabled={!isNextRoundEnabled}
-
             >
               SIGUIENTE RONDA
             </button>)
