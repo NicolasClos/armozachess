@@ -24,7 +24,7 @@ export function generarEmparejamientosSuizos(roundPlayers, prevPairings) {
 
   players = obtenerPermutacionAleatoria(players).sort((a, b) => {
     // Introduce un rango de tolerancia para el ordenamiento
-    const tolerance = 1.5; // Ajusta según tus necesidades
+    const tolerance = 3; // Ajusta según tus necesidades
 
     const aAdjustedPoints = a.points + (Math.random() - 0.5) * tolerance;
     const bAdjustedPoints = b.points + (Math.random() - 0.5) * tolerance;
@@ -61,7 +61,6 @@ export function generarEmparejamientosSuizos(roundPlayers, prevPairings) {
     while (players.length / 2 !== pairings.length && f < 100) {
       if (f > 10) {
         players = obtenerPermutacionAleatoria(roundPlayers);
-        console.log('CHANGE PLAYERS');
       }
 
       pairings = [];
@@ -94,6 +93,7 @@ export function generarEmparejamientosSuizos(roundPlayers, prevPairings) {
 
     // Después de generar los emparejamientos
     const countPlayerType = {};
+    const countPlayedAs = { firstPlayer: {}, secondPlayer: {} };
 
     pairings.forEach((emparejamiento) => {
       const { firstPlayer, secondPlayer } = emparejamiento;
@@ -103,26 +103,59 @@ export function generarEmparejamientosSuizos(roundPlayers, prevPairings) {
 
       countPlayerType[firstPlayer.id].firstPlayer++;
       countPlayerType[secondPlayer.id].secondPlayer++;
+
+      // Contar cuántas veces jugó cada jugador como blancas y negras en prevPairings
+      countPlayedAs.firstPlayer = countPlayedAs.firstPlayer || {};
+      countPlayedAs.secondPlayer = countPlayedAs.secondPlayer || {};
+
+      countPlayedAs.firstPlayer[firstPlayer.id] = countPlayedAs.firstPlayer[firstPlayer.id] || 0;
+      countPlayedAs.secondPlayer[secondPlayer.id] = countPlayedAs.secondPlayer[secondPlayer.id] || 0;
+
+      countPlayedAs.firstPlayer[firstPlayer.id]++;
+      countPlayedAs.secondPlayer[secondPlayer.id]++;
     });
 
+    // Modificar el orden de los emparejamientos para que sea parejo quien jugó de negras y de blancas
     pairings.forEach((emparejamiento) => {
       const { firstPlayer, secondPlayer } = emparejamiento;
 
-      // Verificar si los roles deben invertirse
-      const firstPlayerCount = countPlayerType[firstPlayer.id].firstPlayer;
-      const secondPlayerCount = countPlayerType[secondPlayer.id].secondPlayer;
+      // Verificar cuántas veces ha jugado cada jugador como blancas y negras
+      const firstPlayerPlayedAsWhite = countPlayedAs.firstPlayer[firstPlayer.id] || 0;
+      const secondPlayerPlayedAsWhite = countPlayedAs.firstPlayer[secondPlayer.id] || 0;
 
-      if (firstPlayerCount > players.length / 2 || secondPlayerCount > players.length / 2) {
-        // Invertir los roles
+      // Verificar cuántas veces ha jugado cada jugador como negras y blancas
+      const firstPlayerPlayedAsBlack = countPlayedAs.secondPlayer[firstPlayer.id] || 0;
+      const secondPlayerPlayedAsBlack = countPlayedAs.secondPlayer[secondPlayer.id] || 0;
+
+      // Determinar cuál de los dos jugadores debe jugar como blancas y cuál como negras
+      if (
+        (firstPlayerPlayedAsWhite + secondPlayerPlayedAsBlack > firstPlayerPlayedAsBlack + secondPlayerPlayedAsWhite) ||
+        (secondPlayer.id !== 'BYE')
+      ) {
         emparejamiento.firstPlayer = secondPlayer;
         emparejamiento.secondPlayer = firstPlayer;
-
-        // Actualizar el conteo
-        countPlayerType[firstPlayer.id].firstPlayer--;
-        countPlayerType[secondPlayer.id].secondPlayer--;
       }
     });
 
-    return pairings;
+    function ajustarOrdenBye(pairings) {
+      return pairings.map((emparejamiento) => {
+        const { firstPlayer, secondPlayer } = emparejamiento;
+
+        // Verificar si BYE está involucrado y ajustar el orden
+        if (firstPlayer.id === 'BYE') {
+          return {
+            firstPlayer: secondPlayer,
+            secondPlayer: firstPlayer,
+          };
+        } else if (secondPlayer.id === 'BYE') {
+          return emparejamiento; // No es necesario cambiar el orden si BYE es el segundo jugador
+        } else {
+          return emparejamiento; // Mantener el orden original si BYE no está involucrado
+        }
+      });
+    }
+
+    return ajustarOrdenBye(pairings);
+
   }
 }

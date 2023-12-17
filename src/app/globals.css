@@ -848,15 +848,8 @@ input[type="number"]::-webkit-outer-spin-button {
   padding-top: 0;
 }
 
-.pairingContainer h2{
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff
-}
-
 .pairingContainer ul{
+  margin-top: 100px;
   width: 100%;
   flex-direction: column;
   justify-content: center;
@@ -888,7 +881,7 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 100%;
   align-items: center;
   height: 40px;
-  background-color: hsla(0, 0%, 13%, 0.8);
+  background-color: hsla(0, 0%, 13%, 0.6);
   margin: 10px;
   margin-left: 0 !important;
   margin-right: 0 !important;
@@ -937,7 +930,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .pairingContainer ul li span button:nth-child(2){
-  background-color: hsla(0, 0%, 13%, 0.8);
+  background-color: hsla(0, 0%, 13%, 0.4);
   border-right: none !important;
   border-left: none !important;
 }

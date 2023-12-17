@@ -209,7 +209,6 @@ const Start = () => {
 
   function resetPairingPoints(pairings) {
     if (!Array.isArray(pairings)) {
-      console.error('El parámetro no es un array de pairings válido.');
       return;
     }
 
@@ -463,8 +462,6 @@ const Start = () => {
     }
   }, [togglePairing])
 
-  console.log(tournament)
-
   return (
     <>
       {tournament && !tournament.finished ? <div className='startedTournamentContainer'>
@@ -491,9 +488,12 @@ const Start = () => {
           <button
             className={selectedRound && !selectedRound.finished ? 'buttonReemparejar' : 'd-none'}
             onClick={() => {
+              const prevPairings = rounds
+                .filter(round => round.round !== selectedRound.round)
+                .flatMap(round => round.pairings);
               setTogglePairing(!togglePairing)
               setPairings([])
-              setPairings(generarEmparejamientosSuizos(results, previousPairings))
+              setPairings(generarEmparejamientosSuizos(results, prevPairings))
               setWinners([])
             }}
             disabled={selectedRound && selectedRound.finished}
@@ -501,7 +501,6 @@ const Start = () => {
         </div>
         <div className='startedTournamentPairing'>
           <div className='pairingContainer'>
-            <h2>EMPAREJAMIENTO - RONDA </h2>
             <ul>
               {pairings && pairings.map((pairing, index) => (
                 <div key={index} className='pairingsDivLiContainer'><span>{index + 1}</span><li >

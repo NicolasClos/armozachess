@@ -399,7 +399,7 @@ const Torneos = () => {
         autoClose={5000}
         limit={2}
         hideProgressBar={false}
-        newestOnTop={true}
+        newestOnTop
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
