@@ -14,9 +14,9 @@ import { MdAddCircle } from "react-icons/md";
 
 import { generarEmparejamientosSuizos } from '@/components/pairings'
 
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
-import { CreateTournamentToast, DeleteTournamentToast, CreateTournamentErrorToast, AddPlayerToast, DeletePlayerToast, AddPlayerErrorToast, AddPlayerError2Toast, StartTournamentErrorToast } from '@/components/toasts'
+import { AddPlayerToast } from '@/components/toasts'
 
 function formatFullname(nombre, apellido) {
   if (!nombre || !apellido) {

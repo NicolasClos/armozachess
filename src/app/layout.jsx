@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'ArmozaChess',
-  description: 'Chess CentroCulturalArmoza',
+  description: 'Crea tu Torneo Suizo de Ajedrez',
   icons: {
     icon: '/logo.png',
   }
