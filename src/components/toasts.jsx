@@ -48,7 +48,7 @@ export const CreateTournamentErrorToast = () => {
 
 export const EmptyTournamentErrorToast = () => {
     toast.dismiss()
-    toast.error("¡Ya existe un torneo con mismo nombre!", {
+    toast.error("¡Escriba un nombre para el torneo!", {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,

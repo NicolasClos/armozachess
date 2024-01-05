@@ -73,6 +73,8 @@ const Torneos = () => {
 
   /* FUNCTIONS */
 
+
+
   const addPlayerToList = (tournament, playerName, playerSurname) => {
     addPlayer(tournament, { name: playerName, surname: playerSurname });
     setTournaments(getTournaments());
@@ -91,7 +93,7 @@ const Torneos = () => {
     setSelectedTournament({ ...selectedTournament, players: updatedPlayers });
 
     // Resto de tu lógica...
-    deletePlayer(selectedTournament.name, player.id);
+    deletePlayer(selectedTournament, player.id);
     setSelectedPlayer({});
     updateSelectedTournament({ ...selectedTournament, players: updatedPlayers });
   };
@@ -120,7 +122,7 @@ const Torneos = () => {
     return arrayRounds;
   }
   const clasesDelTorneo = (torneo) => {
-    const claseSeleccionado = selectedTournament && selectedTournament.name === torneo.name
+    const claseSeleccionado = selectedTournament && selectedTournament.id === torneo.id
       ? 'selectedTournament'
       : '';
 
@@ -128,9 +130,9 @@ const Torneos = () => {
 
     const claseTerminado = torneo.finished ? 'finishedTournament' : '';
 
-    const selectedStarted = torneo.started && !torneo.finished && selectedTournament && selectedTournament.name === torneo.name ? 'selectedStartedTournament' : '';
+    const selectedStarted = torneo.started && !torneo.finished && selectedTournament && selectedTournament.id === torneo.id ? 'selectedStartedTournament' : '';
 
-    const selectedFinished = torneo.finished && selectedTournament && selectedTournament.name === torneo.name ? 'selectedFinishedTournament' : '';
+    const selectedFinished = torneo.finished && selectedTournament && selectedTournament.id === torneo.id ? 'selectedFinishedTournament' : '';
 
     return `baseClass ${claseSeleccionado} ${claseIniciado} ${claseTerminado} ${selectedStarted} ${selectedFinished}`;
   };
@@ -183,8 +185,6 @@ const Torneos = () => {
     updateTournamentByeValue(selectedTournament, bye)
   }, [bye, rounds])
 
-
-
   return (
     <div className='tournaments'>
       <div className='tournamentsContainer'>
@@ -211,12 +211,14 @@ const Torneos = () => {
                 setSelectedPlayer({})
                 setSelectedTournament(tournament)
                 setToggle(!toggle)
-              }} className={tournamentClasses}>{tournament ? tournament.name : ''}<span className={selectedTournament.name !== tournament.name ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
-                deleteTournament(selectedTournament)
-                setToggle(!toggle);
-                setSelectedAllPlayer({})
-                setSelectedPlayer({})
-                setShowTournaments(!showTournaments)
+              }} className={tournamentClasses}><span className='tournamentNameContainer'>{tournament ? tournament.name : ''}</span><span className='tournamentDate'>{tournament.date}</span><span className={selectedTournament.id !== tournament.id ? 'spaceButNotDNone deleteTournamentButton' : 'deleteTournamentButton deleteTournamentButtonHover'} onClick={() => {
+                if (selectedTournament.id === tournament.id) {
+                  deleteTournament(selectedTournament)
+                  setToggle(!toggle);
+                  setSelectedAllPlayer({})
+                  setSelectedPlayer({})
+                  setShowTournaments(!showTournaments)
+                }
               }}><BsTrash className='trashIcon' /></span></p>
             )
           })}
@@ -381,7 +383,6 @@ const Torneos = () => {
                       addExistingPlayer(selectedTournament, selectedAllPlayer)
                       setSelectedTournament({ ...selectedTournament, players: [...selectedTournament.players, player] })
                       setPlayers(getPlayersByTournament(selectedTournament))
-                      AddPlayerToast()
                     }} className={selectedAllPlayer.name !== player.name || selectedAllPlayer.surname !== player.surname ? 'd-none addPlayerButton' : 'addPlayerButton'}><MdAddCircle className='addIcon' /></span></p>
                 )
               }) : ''}
@@ -409,7 +410,7 @@ const Torneos = () => {
       </div>
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={2000}
         limit={2}
         hideProgressBar={false}
         newestOnTop

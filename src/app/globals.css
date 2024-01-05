@@ -250,6 +250,22 @@ main div h3{
   margin-top: 65px;
 }
 
+.tournamentNameContainer{
+}
+
+.tournamentDate{
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 50px;
+  position: absolute;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-left: 1px solid rgba(202, 202, 202, 0.5);
+}
+
+
 .deleteTournamentButton{
   height: 39px !important;
   display: flex;
@@ -260,20 +276,16 @@ main div h3{
   background-color: rgba(128, 0, 0, 0.5);
 }
 
-.deleteTournamentButton:hover{
-  background-color: rgba(128, 0, 0, 0.7) !important;
+.deleteTournamentButton:hover .trashIcon{
+  transform: scale(0.95);
+}
+
+.deleteTournamentButtonHover:hover{
+  background-color: rgba(128, 0, 0, 0.8)
 }
 
 .trashIcon{
-  transition: all 0.3s;
-}
-
-.deleteTournamentButton:hover .trashIcon{
-  transform: scale(0.9)
-}
-
-.deleteTournamentButton:hover{
-  background-color: rgba(156, 114, 36, 0.6);
+  transition: transform 0.3s;
 }
 
 .selectedTournament{
@@ -875,6 +887,11 @@ input[type="number"]::-webkit-outer-spin-button {
   align-items: center;
   justify-content: center;
   margin-right: 10px;
+}
+
+.spaceButNotDNone{
+  background-color: transparent !important;
+  color: transparent !important;
 }
 
 /* PAIRING */
