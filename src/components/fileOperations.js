@@ -62,7 +62,6 @@ export const createTournament = (tournamentName) => {
   }
 };
 
-
 export const updateTournaments = (tournament) => {
   let arrayTournaments = getTournaments();
 
@@ -101,6 +100,26 @@ export const updateTournamentStarted = (tournament, started) => {
 
   localStorage.setItem("tournaments", JSON.stringify(updatedTournaments));
 };
+
+export function updatePlayersAllTournaments(updatedPlayers) {
+  
+  let arrayTournaments = getTournaments();
+
+  arrayTournaments.forEach((torneo) => {
+
+    updatedPlayers.forEach((updatedPlayer) => {
+
+      const jugador = torneo.players.find((jugador) => jugador.id === updatedPlayer.id);
+
+      if (jugador) {
+        Object.assign(jugador, updatedPlayer);
+      }
+    });
+  });
+
+  updateTournaments(arrayTournaments);
+  updateAllTournaments(arrayTournaments)
+}
 
 export const updateTournamentFinished = (tournament, finished) => {
   const tournaments = getTournaments();
@@ -277,6 +296,29 @@ export const addPlayer = (tournament, player) => {
     localStorage.setItem("tournaments", JSON.stringify(newArray));
   }
 };
+
+export const updatePlayerNameAndSurnameInAllTournaments = (player, newName, newSurname) => {
+
+  let tournaments = getTournaments();
+
+  tournaments = tournaments.map((tournament) => {
+    const updatedPlayers = tournament.players.map((p) => {
+      if (p.id === player.id) {
+        return {
+          ...player,
+          name: newName !== undefined ? newName : p.name,
+          surname: newSurname !== undefined ? newSurname : p.surname,
+        };
+      }
+      return player;
+    });
+
+    return { ...tournament, players: updatedPlayers };
+  });
+
+  updateTournaments(tournaments);
+};
+
 
 export const updatePlayerInfo = (tournaments)=>{
     for (let i = 0; i < tournaments.length; i++) {

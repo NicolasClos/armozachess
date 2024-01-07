@@ -432,6 +432,45 @@ main div h3{
   margin-right: 20px;
 }
 
+.playersResults > div span:first-child{
+  width: 100%;
+  display: flex;
+  align-items:center !important;
+  height: 40px;
+}
+
+.editPlayerName{
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-item: center;
+  justify-content: center;
+  font-size: 10px !important;
+  position: absolute;
+  right: 130px;
+}
+
+
+.confirmPlayerName{
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-item: center;
+  justify-content: center;
+  font-size: 10px !important;
+  position: absolute;
+  right: 130px;
+}
+
+
+.playersResults input{
+  background: transparent;
+  width: 60% !important;
+  height: 40px;
+  outline: none !important; 
+  border: none !important;
+}
+
 .tournamentDetailsInfo{
   width: 50% !important;
   margin-left: 20px;
@@ -965,7 +1004,8 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .startedTournamentResults ul{
-  height: 60%;
+  height: fit-content;
+  max-height: 60%;
   width: 100%;
   display: flex;
   flex-direction: column;

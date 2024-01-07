@@ -27,8 +27,6 @@ const Start = () => {
   const [firstPlayersResults, setFirstPlayersResults] = useState(Array(pairings.length).fill(''))
   const [secondPlayersResults, setSecondPlayersResults] = useState(Array(pairings.length).fill(''))
 
-  const [updatePlayersElo, setUpdatePlayersElo] = useState([])
-
   const handleFirstPlayersResults = (index, result) => {
     const newResults = [...firstPlayersResults]
     newResults[index] = result
@@ -191,13 +189,15 @@ const Start = () => {
     })
   }
 
+  console.log(tournament.players)
+
   const rePair = () => {
     const prevPairings = rounds
       .filter(round => round.round !== selectedRound.round)
       .flatMap(round => round.pairings)
     setTogglePairing(!togglePairing);
-    // setFirstPlayersResults(Array(pairings.length).fill(''));
-    // setSecondPlayersResults(Array(pairings.length).fill(''))
+    setFirstPlayersResults(Array(pairings.length).fill(''));
+    setSecondPlayersResults(Array(pairings.length).fill(''))
     setPairings([])
     setPairings(generarEmparejamientosSuizos(results, prevPairings))
     setWinners([])
@@ -245,17 +245,14 @@ const Start = () => {
     // Retorna null si la ronda actual no está definida o no tiene la propiedad 'round'
     return null
   }
-  if(tournament){
 
-    console.log(tournament.players)
-  }
 
   useEffect(() => {
     const selectedTournament = getSelectedTournament()
     setTournament({ ...selectedTournament, started: true })
     setRounds(selectedTournament.rounds);
     setSelectedRound(selectedTournament.rounds && selectedTournament.rounds[0])
-    
+
     if (results.length > 0) {
       const resultadoFiltrado = resultado.filter(
         (player) => player.name !== 'BYE'
@@ -327,7 +324,11 @@ const Start = () => {
 
       setResults(resultadoFiltrado)
     }
-  }, [tournament, rounds])
+  }, [tournament, rounds, tournament.players])
+
+  useEffect(() => {
+
+  }, [tournament.players])
 
   useEffect(() => {
     if (tournament && tournament.rounds && tournament.rounds.length > 0) {
@@ -394,7 +395,7 @@ const Start = () => {
       ))
     }
 
-    
+
   }, [selectedRound])
 
   useEffect(() => {
@@ -511,13 +512,13 @@ const Start = () => {
     setUpdatePlayersElo((prevUpdatePlayersElo) => {
       return [...prevUpdatePlayersElo, [firstPlayer.id, eloChange]];
     });
-  
+
     return isNaN(eloChange) ? '' : eloChange;
   };
 
   const calculateEloChange = (firstPlayer, secondPlayer, result, eloAverage) => {
     const eloChange = updateElo(firstPlayer, secondPlayer, result, eloAverage, tournament.byeValue);
-  
+
     return isNaN(eloChange) ? '' : eloChange;
   };
   return (
@@ -526,23 +527,23 @@ const Start = () => {
         <div className='startedTournamentRoundsContainer'>
           <div>
             <div>
-            {tournament &&
-              tournament.rounds &&
-              rounds &&
-              rounds.map((round, index) => (
-                <div key={index}>
-                  <p
-                    className={`${selectedRound.round === round.round ? 'selectedRound' : ''
-                      } ${index > 0 && !rounds[index].started ? 'disabledRound' : ''}`}
-                    onClick={() => {
-                      if (rounds[index].started) {
-                        setSelectedRound(round)
-                      }
-                    }}
-                  >{`Ronda ${index + 1}`}</p>
-                </div>
-              ))}
-              </div>
+              {tournament &&
+                tournament.rounds &&
+                rounds &&
+                rounds.map((round, index) => (
+                  <div key={index}>
+                    <p
+                      className={`${selectedRound.round === round.round ? 'selectedRound' : ''
+                        } ${index > 0 && !rounds[index].started ? 'disabledRound' : ''}`}
+                      onClick={() => {
+                        if (rounds[index].started) {
+                          setSelectedRound(round)
+                        }
+                      }}
+                    >{`Ronda ${index + 1}`}</p>
+                  </div>
+                ))}
+            </div>
           </div>
           <button
             className={selectedRound && !selectedRound.finished && selectedRound.started ? 'buttonReemparejar' : 'd-none'}
@@ -602,7 +603,7 @@ const Start = () => {
                         }}
                           disabled={selectedRound.finished} className={winners[index] === 'BYE' ? "selectedBye" : "byeButton"}>BYE</button>}
                       </span>
-                      <span>{secondPlayersResults[index] ?<span className={pairing.secondPlayer.name !== 'BYE' && calculateEloChange(pairing.secondPlayer, pairing.firstPlayer, secondPlayersResults[index], eloAverage) >= 0 ? 'greenElo' : 'redElo'}>
+                      <span>{secondPlayersResults[index] ? <span className={pairing.secondPlayer.name !== 'BYE' && calculateEloChange(pairing.secondPlayer, pairing.firstPlayer, secondPlayersResults[index], eloAverage) >= 0 ? 'greenElo' : 'redElo'}>
                         {pairing.secondPlayer.name !== 'BYE' &&
                           calculateEloChange(pairing.secondPlayer, pairing.firstPlayer, secondPlayersResults[index], eloAverage) > 0 && '+'}
                         {pairing.secondPlayer.name !== 'BYE' &&
@@ -636,51 +637,67 @@ const Start = () => {
                     </li>
                   ))}
             </div>
-            
+
           </ul>
           <div className='nextRoundContainer'>
-              {selectedRound && !selectedRound.finished && !selectedRound.isLast ? (<button
-                className={!isNextRoundEnabled ? 'nextRoundDisabled' : 'nextRound'}
-                onClick={() => {
+            {selectedRound && !selectedRound.finished && !selectedRound.isLast ? (<button
+              className={!isNextRoundEnabled ? 'nextRoundDisabled' : 'nextRound'}
+              onClick={() => {
 
-                  setSelectedRound({ ...selectedRound, pairings: pairings, winners: winners, firstPlayersResults: firstPlayersResults, secondPlayersResults: secondPlayersResults })
+                setSelectedRound({ ...selectedRound, pairings: pairings, winners: winners, firstPlayersResults: firstPlayersResults, secondPlayersResults: secondPlayersResults })
 
-                  const nextRound = rounds.find((round, index) => index === indexRound + 1)
-                  setRounds((prevRounds) =>
-                    prevRounds.map((round, ind) => {
-                      if (round.round === selectedRound.round) {
-                        return { ...selectedRound, finished: true, winners: winners }
-                      } else if (round === nextRound) {
-                        return { ...nextRound, started: true }
-                      } else {
-                        return round
-                      }
+
+                const players = updatePlayerStats(tournament.players, winners, pairings, eloAverage, tournament.byeValue)
+
+                const nextRound = rounds.find((_, index) => index === indexRound + 1);
+                setRounds((prevRounds) =>
+                  prevRounds.map((round) => {
+                    if (round.round === selectedRound.round) {
+                      return { ...selectedRound, finished: true, winners: winners, playersRound: selectedRound.playersRound.map((p) => {
+                        const matchingPlayer = players.find((player) => player.id === p.id);
+                        return matchingPlayer ? { ...p, elo: matchingPlayer.elo } : p;
+                      }), };
+                    } else if (round === nextRound) {
+                      const updatedNextRound = {
+                        ...nextRound,
+                        started: true,
+                      };
+                      return updatedNextRound;
+                    } else {
+                      return { ...round, playersRound: players };
                     }
-                    )
-                  )
+                  })
+                );
 
-                  setPairings(generarEmparejamientosSuizos(results, previousPairings))
-                  setSelectedRound({ ...nextRound, started: true })
-                  updateSelectedTournament({ ...tournament, rounds: rounds, players: updatePlayerStats(tournament.players, winners, pairings, eloAverage, tournament.byeValue) })
-                  updateTournaments({ ...tournament, rounds: rounds, players: updatePlayerStats(tournament.players, winners, pairings, eloAverage, tournament.byeValue)})
-                }}
-                disabled={!isNextRoundEnabled}
-              >
-                SIGUIENTE RONDA
-              </button>)
-                : selectedRound && selectedRound.isLast && isNextRoundEnabled ?
-                  <Link
-                    href="/torneos"
-                    onClick={() => {
-                      setTournament({ ...tournament, winner: results[0], finished: true, results: finalResults })
-                      updateSelectedTournament({ ...tournament, rounds: rounds })
-                      updateTournaments({ ...tournament, rounds: rounds })
-                    }}
-                    className='nextRound'
-                  >
-                    TERMINAR TORNEO
-                  </Link> : ''}
-            </div>
+                setPairings(generarEmparejamientosSuizos(results, previousPairings))
+                setSelectedRound({ ...nextRound, started: true })
+
+
+                updateSelectedTournament({ ...tournament, rounds: rounds, players: players })
+                updateTournaments({ ...tournament, rounds: rounds, players: players })
+
+
+                setFirstPlayersResults(Array(pairings.length).fill(''));
+                setSecondPlayersResults(Array(pairings.length).fill(''))
+
+              }}
+              disabled={!isNextRoundEnabled}
+            >
+              SIGUIENTE RONDA
+            </button>)
+              : selectedRound && selectedRound.isLast && isNextRoundEnabled ?
+                <Link
+                  href="/torneos"
+                  onClick={() => {
+                    setTournament({ ...tournament, winner: results[0], finished: true, results: finalResults })
+                    updateSelectedTournament({ ...tournament, rounds: rounds })
+                    updateTournaments({ ...tournament, rounds: rounds })
+                  }}
+                  className='nextRound'
+                >
+                  TERMINAR TORNEO
+                </Link> : ''}
+          </div>
         </div>
       </div></> : ''}</>
   )

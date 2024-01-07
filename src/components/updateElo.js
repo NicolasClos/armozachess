@@ -2,7 +2,7 @@ export default function updateElo(player, opponent, result, tournamentEloAverage
     const calculateExpectedScore = (opponentElo) => {
       return 1 / (1 + 10 ** ((opponentElo - player.elo) / 400));
     };
-  
+
     const kFactor = player.games < 30 ? 40 : 20;
   
     if (result === 'BYE') {

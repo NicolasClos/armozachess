@@ -6,6 +6,8 @@ import Link from 'next/link'
 
 import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 
+import { MdEdit, MdOutlineDone } from "react-icons/md";
+
 import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentStarted, updateTournaments, updateAllTournaments } from '@/components/fileOperations'
 
 import { BsTrash } from "react-icons/bs"
@@ -19,6 +21,7 @@ import { generarEmparejamientosSuizos } from '@/components/pairings'
 import { ToastContainer } from "react-toastify"
 
 import { AddPlayerToast } from '@/components/toasts'
+
 
 function formatFullname(nombre, apellido) {
   if (!nombre || !apellido) {
@@ -73,9 +76,11 @@ const Torneos = () => {
 
   const [updatePlayers, setUpdatePlayers] = useState(false)
 
+
+const [isEditing, setIsEditing] = useState(false);
+const [editedName, setEditedName] = useState('');
+
   /* FUNCTIONS */
-
-
 
   const addPlayerToList = (tournament, playerName, playerSurname) => {
     addPlayer(tournament, { name: playerName, surname: playerSurname })
@@ -189,6 +194,20 @@ const Torneos = () => {
     updateTournamentByeValue(selectedTournament, bye)
   }, [bye, rounds])
 
+  const handleEditClick = (player) => {
+    setIsEditing(true);
+    setEditedName(player.name); // Set the current name to the editedName state
+  };
+
+  const handleAcceptClick = () => {
+    setIsEditing(false);
+    // Perform any logic you need to update the player name (e.g., API call)
+    // Once the update is successful, you can update the local state or refetch the data.
+  };
+
+  const handleInputChange = (e) => {
+    setEditedName(e.target.value);
+  };
   return (
     <div className='tournaments'>
       <div className='tournamentsContainer'>
@@ -353,21 +372,64 @@ const Torneos = () => {
         <div className='playersResultsContainer'>
           <div className='playersResults'>
             <h3>Jugadores del torneo:&nbsp;<span className='tournamentName'>{selectedTournament.name}</span><span className='armozaElo'>ELO<i>Armoza</i></span><span>{selectedTournament && selectedTournament.players && players && players.length}</span></h3>
-            <div>
-              {players && Object.keys(selectedTournament).length !== 0 ? players.filter(
-                (player) => player.name !== 'BYE'
-              ).reverse().map((player, index) => {
-                return (
-                  <p onClick={() => {
-                    selectedTournament && !selectedTournament.finished ? setSelectedPlayer(player) : ''
-                    setToggle(!toggle)
-                    setSelectedAllPlayer({})
-                  }} className={selectedPlayer.id == player.id ? 'selectedPlayer' : ''} key={index + 1}>{player.name && typeof player.name === 'string' && player.surname && typeof player.surname === 'string' ? formatFullname(player.name, player.surname) : ''}<span className='playerElo'>{player.elo}{player.games < 6 ? '?' : ''}</span><span className={selectedPlayer.id !== player.id || selectedTournament.finished ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
-                    deletePlayerFromList(player)
-                    setUpdatePlayers(!updatePlayers)
-                  }}><BsTrash className='trashIcon' /></span></p>
-                )
-              }) : ''}
+            <div>{players &&
+        Object.keys(selectedTournament).length !== 0 &&
+        players
+          .filter((player) => player.name !== 'BYE')
+          .reverse()
+          .map((player, index) => (
+            <p
+              onClick={() => {
+                selectedTournament && !selectedTournament.finished
+                  ? setSelectedPlayer(player)
+                  : '';
+              }}
+              className={selectedPlayer.id === player.id ? 'selectedPlayer' : ''}
+              key={index + 1}
+            >
+              <span>
+                {isEditing ? (
+                  <input
+                    value={editedName}
+                    onChange={handleInputChange}
+                    className='editable-input'
+                  />
+                ) : (
+                  player.name
+                )}
+                {isEditing ? (
+                  <MdOutlineDone onClick={handleAcceptClick} className={
+                    selectedPlayer.id !== player.id || selectedTournament.finished
+                      ? 'd-none confirmPlayerName'
+                      : 'confirmPlayerName'
+                  }/>
+                ) : (
+                  <MdEdit onClick={() => handleEditClick(player)} className={
+                    selectedPlayer.id !== player.id || selectedTournament.finished
+                      ? 'd-none editPlayerName'
+                      : 'editPlayerName'
+                  } />
+                )}
+              </span>
+
+              <span className='playerElo'>
+                {player.elo}
+                {player.games < 6 ? '?' : ''}
+              </span>
+              <span
+                className={
+                  selectedPlayer.id !== player.id || selectedTournament.finished
+                    ? 'd-none deleteTournamentButton'
+                    : 'deleteTournamentButton'
+                }
+                onClick={() => {
+                  setUpdatePlayers((prev) => !prev);
+                }}
+              >
+                <BsTrash className='trashIcon' />
+              </span>
+            </p>
+          ))}
             </div>
           </div>
           <div className={selectedTournament.finished ? 'd-none playersResultsFastAdd' : 'playersResultsFastAdd'}>

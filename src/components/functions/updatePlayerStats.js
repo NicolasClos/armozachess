@@ -8,7 +8,7 @@ export default function updatePlayerStats(players, winners, pairings, tournament
       const firstPlayer = updatedPlayers.find((player) => player.id === pairing.firstPlayer.id);
       const secondPlayer = updatedPlayers.find((player) => player.id === pairing.secondPlayer.id);
   
-      if (secondPlayer.name !== 'BYE') {
+      if (secondPlayer && secondPlayer.name !== 'BYE') {
         // Ignorar al jugador que es secondPlayer con nombre 'BYE'
         const isDraw = winner === 'draw';
         const isFirstPlayerWinner = winner === 'firstPlayer';
@@ -30,16 +30,16 @@ export default function updatePlayerStats(players, winners, pairings, tournament
         secondPlayer.games++;
   
         // Modificar el ELO usando la función updateElo
-        const eloChangeFirst = updateElo(firstPlayer, secondPlayer, isFirstPlayerWinner ? 'win' : isSecondPlayerWinner ? 'lose' : 'draw', tournamentEloAverage, byeValue);
-        
-        const eloChangeSecond = updateElo(secondPlayer, firstPlayer, isSecondPlayerWinner ? 'win' : isFirstPlayerWinner ? 'lose' : 'draw', tournamentEloAverage, byeValue);
-        
-        console.log(firstPlayer.elo, eloChangeFirst)
-
+        const eloChangeFirst = updateElo(firstPlayer, secondPlayer, isFirstPlayerWinner ? 'win' : isSecondPlayerWinner ? 'lose' : 'draw');
+        const eloChangeSecond = updateElo(secondPlayer, firstPlayer, isSecondPlayerWinner ? 'win' : isFirstPlayerWinner ? 'lose' : 'draw');
         firstPlayer.elo += eloChangeFirst;
         secondPlayer.elo += eloChangeSecond;
+      }else{
+        const eloChangeFirst = updateElo(firstPlayer, secondPlayer, 'BYE', tournamentEloAverage, byeValue);
+        firstPlayer.games++;
+        firstPlayer.elo += eloChangeFirst;
       }
-    });
+    })
   
     return updatedPlayers;
   }
