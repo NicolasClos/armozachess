@@ -1,45 +1,47 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react'
 
 import Link from 'next/link'
 
-import { BsChevronDown, BsChevronUp } from "react-icons/bs";
+import { BsChevronDown, BsChevronUp } from "react-icons/bs"
 
-import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentStarted, updateTournaments, updateAllTournaments } from '@/components/fileOperations';
+import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentStarted, updateTournaments, updateAllTournaments } from '@/components/fileOperations'
 
-import { BsTrash } from "react-icons/bs";
+import { BsTrash } from "react-icons/bs"
 
-import { MdAddCircle } from "react-icons/md";
+import { FaTrophy } from "react-icons/fa6";
+
+import { MdAddCircle } from "react-icons/md"
 
 import { generarEmparejamientosSuizos } from '@/components/pairings'
 
-import { ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify"
 
 import { AddPlayerToast } from '@/components/toasts'
 
 function formatFullname(nombre, apellido) {
   if (!nombre || !apellido) {
-    return "Nombre y apellido son obligatorios.";
+    return "Nombre y apellido son obligatorios."
   }
 
   const nombreFormateado = nombre
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+    .join(' ')
 
-  const apellidoFormateado = apellido.charAt(0).toUpperCase() + apellido.slice(1).toLowerCase();
+  const apellidoFormateado = apellido.charAt(0).toUpperCase() + apellido.slice(1).toLowerCase()
 
-  const nombreCompletoFormateado = `${nombreFormateado} ${apellidoFormateado}`;
+  const nombreCompletoFormateado = `${nombreFormateado} ${apellidoFormateado}`
 
-  return nombreCompletoFormateado;
+  return nombreCompletoFormateado
 }
 
 const Torneos = () => {
 
   /* STATES */
 
-  const [tournaments, setTournaments] = useState([]);
+  const [tournaments, setTournaments] = useState([])
 
   const [players, setPlayers] = useState([])
 
@@ -76,37 +78,37 @@ const Torneos = () => {
 
 
   const addPlayerToList = (tournament, playerName, playerSurname) => {
-    addPlayer(tournament, { name: playerName, surname: playerSurname });
-    setTournaments(getTournaments());
-    setPlayers(getPlayersByTournament(selectedTournament));
+    addPlayer(tournament, { name: playerName, surname: playerSurname })
+    setTournaments(getTournaments())
+    setPlayers(getPlayersByTournament(selectedTournament))
     setInputPlayerName('')
-    setInputPlayerSurname('');
+    setInputPlayerSurname('')
     setSelectedTournament({ ...selectedTournament, players: [...selectedTournament.players, { name: playerName, surname: playerSurname }] })
-    updateSelectedTournament(selectedTournament);
+    updateSelectedTournament(selectedTournament)
   }
 
   const deletePlayerFromList = (player) => {
     // Eliminar el jugador de la lista en selectedTournament
-    const updatedPlayers = selectedTournament.players.filter((p) => p.id !== player.id);
+    const updatedPlayers = selectedTournament.players.filter((p) => p.id !== player.id)
 
     // Actualizar selectedTournament con la nueva lista de jugadores
-    setSelectedTournament({ ...selectedTournament, players: updatedPlayers });
+    setSelectedTournament({ ...selectedTournament, players: updatedPlayers })
 
     // Resto de tu lógica...
-    deletePlayer(selectedTournament, player.id);
-    setSelectedPlayer({});
-    updateSelectedTournament({ ...selectedTournament, players: updatedPlayers });
-  };
+    deletePlayer(selectedTournament, player.id)
+    setSelectedPlayer({})
+    updateSelectedTournament({ ...selectedTournament, players: updatedPlayers })
+  }
 
 
   const torneoVacio = () => {
-    setSelectedTournament({});
+    setSelectedTournament({})
     updateSelectedTournament({})
   }
 
   function roundsArray(cantidad) {
     const arrayRounds = Array.from({ length: cantidad }, (_, index) => {
-      const isLast = index === cantidad - 1;
+      const isLast = index === cantidad - 1
 
       return {
         round: Number(index + 1),
@@ -116,60 +118,62 @@ const Torneos = () => {
         started: index === 0,
         finished: false,
         isLast: isLast,
-      };
-    });
+        firstPlayersResults: [],
+        secondPlayersResults: []
+      }
+    })
 
-    return arrayRounds;
+    return arrayRounds
   }
   const clasesDelTorneo = (torneo) => {
     const claseSeleccionado = selectedTournament && selectedTournament.id === torneo.id
       ? 'selectedTournament'
-      : '';
+      : ''
 
-    const claseIniciado = torneo.started ? 'startedTournament' : '';
+    const claseIniciado = torneo.started ? 'startedTournament' : ''
 
-    const claseTerminado = torneo.finished ? 'finishedTournament' : '';
+    const claseTerminado = torneo.finished ? 'finishedTournament' : ''
 
-    const selectedStarted = torneo.started && !torneo.finished && selectedTournament && selectedTournament.id === torneo.id ? 'selectedStartedTournament' : '';
+    const selectedStarted = torneo.started && !torneo.finished && selectedTournament && selectedTournament.id === torneo.id ? 'selectedStartedTournament' : ''
 
-    const selectedFinished = torneo.finished && selectedTournament && selectedTournament.id === torneo.id ? 'selectedFinishedTournament' : '';
+    const selectedFinished = torneo.finished && selectedTournament && selectedTournament.id === torneo.id ? 'selectedFinishedTournament' : ''
 
-    return `baseClass ${claseSeleccionado} ${claseIniciado} ${claseTerminado} ${selectedStarted} ${selectedFinished}`;
-  };
+    return `baseClass ${claseSeleccionado} ${claseIniciado} ${claseTerminado} ${selectedStarted} ${selectedFinished}`
+  }
 
   // TABS ADD PLAYER
 
-  const inputRefs = [useRef(), useRef(), useRef()];
+  const inputRefs = [useRef(), useRef(), useRef()]
 
   const manejarKeyDown = (event, inputIndex) => {
-    const nextInputIndex = (inputIndex + 1) % 3;
+    const nextInputIndex = (inputIndex + 1) % 3
 
     if (event.key === 'Tab') {
-      event.preventDefault();
+      event.preventDefault()
       if (nextInputIndex === 0) {
-        inputRefs[0].current.focus();
+        inputRefs[0].current.focus()
       } else {
-        inputRefs[nextInputIndex].current.focus();
+        inputRefs[nextInputIndex].current.focus()
       }
     } else if (inputIndex === 2 && event.key === 'Enter') {
       if (inputPlayerName !== '' && inputPlayerSurname !== '') {
-        addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname);
-        inputRefs[nextInputIndex].current.focus();
+        addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname)
+        inputRefs[nextInputIndex].current.focus()
         setInputPlayerName('')
         setInputPlayerSurname('')
       }
     }
-  };
+  }
 
   /* EFFECTS */
 
   useEffect(() => {
-    setPlayers(getPlayersByTournament(selectedTournament));
+    setPlayers(getPlayersByTournament(selectedTournament))
     setBye(selectedTournament.byeValue)
   }, [selectedTournament, updatePlayers])
 
   useEffect(() => {
-    updateSelectedTournament(selectedTournament);
+    updateSelectedTournament(selectedTournament)
   }, [selectedTournament, addPlayerToList, deletePlayerFromList, bye, rounds])
 
   useEffect(() => {
@@ -177,8 +181,8 @@ const Torneos = () => {
   }, [showTournaments])
 
   useEffect(() => {
-    setTournaments(getTournaments());
-    updateSelectedTournament(selectedTournament);
+    setTournaments(getTournaments())
+    updateSelectedTournament(selectedTournament)
   }, [toggle])
 
   useEffect(() => {
@@ -195,15 +199,15 @@ const Torneos = () => {
               setInputTournament(e.target.value)
             }} />
             <button onClick={() => {
-              createTournament(inputTournament);
-              setToggle(!toggle);
-              setInputTournament('');
+              createTournament(inputTournament)
+              setToggle(!toggle)
+              setInputTournament('')
             }}>Crear</button>
           </div>
         </div>
         <div className='tournamentResults'>
-          {tournaments.map((tournament, index) => {
-            const tournamentClasses = clasesDelTorneo(tournament);
+          {[...tournaments].reverse().map((tournament, index) => {
+            const tournamentClasses = clasesDelTorneo(tournament)
             return (
               <p key={index + 1} onClick={() => {
                 setSelectedTournament(tournament)
@@ -214,7 +218,7 @@ const Torneos = () => {
               }} className={tournamentClasses}><span className='tournamentNameContainer'>{tournament ? tournament.name : ''}</span><span className='tournamentDate'>{tournament.date}</span><span className={selectedTournament.id !== tournament.id ? 'spaceButNotDNone deleteTournamentButton' : 'deleteTournamentButton deleteTournamentButtonHover'} onClick={() => {
                 if (selectedTournament.id === tournament.id) {
                   deleteTournament(selectedTournament)
-                  setToggle(!toggle);
+                  setToggle(!toggle)
                   setSelectedAllPlayer({})
                   setSelectedPlayer({})
                   setShowTournaments(!showTournaments)
@@ -245,7 +249,7 @@ const Torneos = () => {
                 onKeyDown={(event) => manejarKeyDown(event, 1)} />
             </div>
             <button onClick={() => {
-              if (inputPlayerName !== '' && inputPlayerSurname !== '') { addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname); }
+              if (inputPlayerName !== '' && inputPlayerSurname !== '') { addPlayerToList(selectedTournament, inputPlayerName, inputPlayerSurname) }
             }}
               id="input3"
               ref={inputRefs[2]}
@@ -348,7 +352,7 @@ const Torneos = () => {
         </div>
         <div className='playersResultsContainer'>
           <div className='playersResults'>
-            <h3>Jugadores del torneo:<span className='tournamentName'>&nbsp;{selectedTournament.name}</span><span>{selectedTournament && selectedTournament.players && players && players.length}</span></h3>
+            <h3>Jugadores del torneo:&nbsp;<span className='tournamentName'>{selectedTournament.name}</span><span className='armozaElo'>ELO<i>Armoza</i></span><span>{selectedTournament && selectedTournament.players && players && players.length}</span></h3>
             <div>
               {players && Object.keys(selectedTournament).length !== 0 ? players.filter(
                 (player) => player.name !== 'BYE'
@@ -358,7 +362,7 @@ const Torneos = () => {
                     selectedTournament && !selectedTournament.finished ? setSelectedPlayer(player) : ''
                     setToggle(!toggle)
                     setSelectedAllPlayer({})
-                  }} className={selectedPlayer.id == player.id ? 'selectedPlayer' : ''} key={index + 1}>{player.name && typeof player.name === 'string' && player.surname && typeof player.surname === 'string' ? formatFullname(player.name, player.surname) : ''}<span className={selectedPlayer.id !== player.id || selectedTournament.finished ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
+                  }} className={selectedPlayer.id == player.id ? 'selectedPlayer' : ''} key={index + 1}>{player.name && typeof player.name === 'string' && player.surname && typeof player.surname === 'string' ? formatFullname(player.name, player.surname) : ''}<span className='playerElo'>{player.elo}{player.games < 6 ? '?' : ''}</span><span className={selectedPlayer.id !== player.id || selectedTournament.finished ? 'd-none deleteTournamentButton' : 'deleteTournamentButton'} onClick={() => {
                     deletePlayerFromList(player)
                     setUpdatePlayers(!updatePlayers)
                   }}><BsTrash className='trashIcon' /></span></p>
@@ -367,19 +371,19 @@ const Torneos = () => {
             </div>
           </div>
           <div className={selectedTournament.finished ? 'd-none playersResultsFastAdd' : 'playersResultsFastAdd'}>
-            <h3>AGREGADO RAPIDO</h3>
+            <h3>AGREGADO RAPIDO<span className='armozaEloFastAdd'>ELO<i>Armoza</i></span><span></span></h3>
             <div>
               {Object.keys(selectedTournament).length !== 0 ? getAllPlayers(players).filter(
                 (player) => player.name !== 'BYE'
               ).map((player, index) => {
                 return (
                   <p onClick={() => {
-                    setSelectedAllPlayer(player);
+                    setSelectedAllPlayer(player)
                     setToggle(!toggle)
                     setSelectedPlayer({})
                   }} className={selectedAllPlayer.name == player.name && selectedAllPlayer.surname == player.surname ? 'selectedPlayer' : ''} key={index + 1}>{player.name ? `${player.name.charAt(0).toUpperCase()}${player.name.slice(1).toLowerCase()}` : ''}{' '}
                     {player.surname ? `${player.surname.charAt(0).toUpperCase()}${player.surname.slice(1).toLowerCase()}` : ''}
-                    <span onClick={() => {
+                    <span className='playerElo'>{player.elo}{player.games < 6 ? '?' : ''}</span><span onClick={() => {
                       addExistingPlayer(selectedTournament, selectedAllPlayer)
                       setSelectedTournament({ ...selectedTournament, players: [...selectedTournament.players, player] })
                       setPlayers(getPlayersByTournament(selectedTournament))
@@ -390,16 +394,16 @@ const Torneos = () => {
           </div>
           <div className={selectedTournament.finished ? 'finalResultsContainer' : 'd-none'}>
             <div className='finalResults '>
-              <p><span>Jugador</span><span>Puntos</span></p>
+              <p><span>Jugador</span><span className='armozaEloFinalResults'>ELO<i>Armoza</i></span><span>Puntos</span></p>
               <ul className='finalResultsScroll overflow-y-auto'>
                 {selectedTournament.results &&
                   selectedTournament.results
                     .slice()
                     .sort((a, b) => b.points - a.points)
                     .map((player, index) => (
-                      <li key={index}>
-                        <span>{index + 1}.{`   ${player.name} ${player.surname}`}</span>
-                        <span>{player.points}</span>
+                      <li className='finalResultsLi' key={index}>
+                        <span>{index + 1}.{`   ${player.name} ${player.surname}`}{index === 0 ? <FaTrophy className='firstPlaceTrophy' /> : index === 1 ? <FaTrophy className='secondPlaceTrophy' /> : index === 2 ? <FaTrophy className='thirdPlaceTrophy' />  : ''}</span>
+                        <span className='playerEloFinalResults'>{player.elo}{player.games < 6 ? '?' : ''}</span><span>{player.points}</span>
                       </li>
                     ))}
               </ul>

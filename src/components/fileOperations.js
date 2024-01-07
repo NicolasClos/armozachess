@@ -8,8 +8,6 @@ export const getTournaments = () => {
   return []
 }
 
-
-
 export const createTournament = (tournamentName) => {
   const generateAutoIncrementalId = (tournaments) => {
     const lastTournament = tournaments[tournaments.length - 1];
@@ -258,9 +256,13 @@ export const addPlayer = (tournament, player) => {
         const newPlayer = {
           ...player,
           id: newPlayerId,
+          tournaments: [{ id: 0, rounds: [{ oponentId: 0, result: 0, color: 0 }], points: 0 }],
           points: 0,
-          tournaments: [{ id: 0, rounds: [{ id: 0, result: 0, color: 0 }] }],
-          elo: 1200
+          elo: 1500,
+          games: 0,
+          wins: 0,
+          loses: 0,
+          draws: 0
         };
         return {
           ...objeto,
@@ -275,6 +277,29 @@ export const addPlayer = (tournament, player) => {
     localStorage.setItem("tournaments", JSON.stringify(newArray));
   }
 };
+
+export const updatePlayerInfo = (tournaments)=>{
+    for (let i = 0; i < tournaments.length; i++) {
+      const torneo = tournaments[i];
+
+      // Actualizar las estadísticas para cada jugador en el torneo
+      for (let j = 0; j < torneo.players.length; j++) {
+          const jugador = torneo.players[j];
+
+          // Encontrar el torneo específico del jugador
+          const torneoJugador = jugador.tournaments.find(t => t.id === torneo.id);
+
+          // Si se encuentra el torneo, actualizar las estadísticas
+          if (torneoJugador) {
+              jugador.elo = calcularNuevoElo(jugador.elo, torneoJugador.points);
+              jugador.games += torneoJugador.rounds.length;
+              jugador.wins += contarResultados(torneoJugador.rounds, 1); // 1 representa una victoria
+              jugador.draws += contarResultados(torneoJugador.rounds, 0); // 0 representa un empate
+              jugador.loses += contarResultados(torneoJugador.rounds, -1); // -1 representa una derrota
+          }
+      }
+  }
+}
 
 export const addExistingPlayer = (tournament, player) => {
   const tournaments = getTournaments();
@@ -372,3 +397,19 @@ export const getPlayersByTournament = (tournament) => {
     return (selectedTournament ? selectedTournament.players : [])
   }
 }
+
+export const updateEloInTournaments = (updates) => {
+  const tournaments = getTournaments();
+
+  updates.forEach(([playerId, eloVariation]) => {
+    tournaments.forEach((tournament) => {
+      const playerIndex = tournament.players.findIndex((player) => player.id === playerId);
+
+      if (playerIndex !== -1) {
+        tournament.players[playerIndex].elo += eloVariation;
+      }
+    });
+  });
+
+  localStorage.setItem("tournaments", JSON.stringify(tournaments));
+};

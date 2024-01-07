@@ -48,7 +48,7 @@ export const CreateTournamentErrorToast = () => {
 
 export const EmptyTournamentErrorToast = () => {
     toast.dismiss()
-    toast.error("¡Escriba un nombre para el torneo!", {
+    toast.error("¡El nombre del torneo no puede estar compuesto por espacios unicamente!", {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
