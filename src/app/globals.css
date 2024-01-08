@@ -12,6 +12,11 @@
   user-select: none;
 }
 
+h4{
+  font-size: 16px !important;
+  margin-bottom: 0 !important;
+}
+
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -72,6 +77,10 @@ header nav ul li{
   justify-content: center;
 }
 
+p{
+  margin-bottom: 0 !important;
+}
+
 header nav ul li a{
   display: flex;
   align-items: center;
@@ -79,6 +88,8 @@ header nav ul li a{
   height: 100%;
   width: 100%;
   transition: all 0.3s;
+  text-decoration: none;
+  color: #fff;
 }
 
 header nav ul li a:hover{
@@ -107,12 +118,13 @@ main div{
 }
 
 main div h1{
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 100;
 }
 
 main div h3{
   font-weight: 100;
+  font-size: 20px;
 }
 
 .mainEmpezar{
@@ -127,6 +139,7 @@ main div h3{
   border-radius: 30px;
   transition: all 0.3s;
   margin-top: 20px;
+  text-decoration: none;
 }
 
 .mainEmpezar:hover{
@@ -171,6 +184,7 @@ main div h3{
   height: 40px;
   width: 100%;
   transition: all 0.3s;
+  text-decoration: none;
 }
 
 .startTournament:hover{
@@ -256,6 +270,7 @@ main div h3{
 }
 
 .armozaElo{
+  font-size: 18px !important;
   height: 40px;
   display: flex;
   align-items: center;
@@ -269,6 +284,7 @@ main div h3{
 }
 
 .armozaEloFastAdd{
+  font-size: 18px !important;
   height: 40px;
   display: flex;
   align-items: center;
@@ -350,9 +366,11 @@ main div h3{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
+  width: 50px !important;
   font-size: 20px;
   background-color: rgba(128, 0, 0, 0.5);
+  position: absolute;
+  right: 0;
 }
 
 .deleteTournamentButton:hover .trashIcon{
@@ -373,7 +391,44 @@ main div h3{
 
 .selectedPlayer{
   background-color: rgba(156, 114, 36, 0.6);
-  border: 1px solid rgb(248, 170, 26) !important;
+  outline: 1px solid rgb(248, 170, 26) !important;
+  border-bottom: 0 !important;
+}
+
+.modalContainer{
+
+  border: none !important;
+}
+
+.modalHeader{
+  background-color: hsla(0, 0%, 0%, 0.9);
+  color: #fff;
+  border-top-left-radius: red !important;
+  border-top-right-radius: none !important;
+}
+
+.modalBody{
+  background-color: hsla(0, 0%, 0%, 0.8);
+}
+
+.modalFooter{
+  background-color: hsla(0, 0%, 0%, 1)!important;
+}
+
+.modalInputsContainer{
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: column;
+
+}
+
+.modalInputsContainer input{
+  color: black;
+  padding: 10px;
+  height: 40px;
+  width: 100%;
 }
 
 .selectedPlayer:first-child{
@@ -394,6 +449,11 @@ main div h3{
   height: 60vh !important;
   margin-top: 50px;
   max-height: 60vh !important;
+}
+
+.playersResults h3{
+  font-size: 16px;
+  margin-bottom: 0 !important;
 }
 
 .startedTournament{
@@ -443,11 +503,10 @@ main div h3{
   width: 20px;
   height: 20px;
   display: flex;
-  align-item: center;
   justify-content: center;
   font-size: 10px !important;
   position: absolute;
-  right: 130px;
+  right: 180px;
 }
 
 
@@ -495,7 +554,7 @@ main div h3{
 }
 
 .tournamentDetailsInfo > div > div:first-child label{
-  margin-bottom: 13px;
+  margin-bottom: 10.5px;
 }
 
 .tournamentDetailsInfo > div > div:first-child > div{
@@ -530,6 +589,11 @@ main div h3{
   height: 100% !important;
   justify-content: flex-end;
   margin-left: 20px;
+}
+
+.playersResultsFastAdd h3{
+  font-size: 16px;
+  margin-bottom: 0 !important;
 }
 
 .playersResultsFastAdd:last-child{
@@ -803,7 +867,7 @@ input:focus{
 
 .byeContainer p{
   color: #fff;
-  margin-bottom: 13px;
+  margin-bottom: 10px !important
 }
 
 .tournamentDetails label {

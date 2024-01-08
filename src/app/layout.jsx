@@ -14,10 +14,12 @@ export const metadata = {
     icon: '/logo.png',
   }
 }
-
 export default function RootLayout({
   children,
-}) {
+})
+
+
+{
   return (
     <html lang="en">
       <body className={inter.className}>

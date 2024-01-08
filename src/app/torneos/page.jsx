@@ -10,6 +10,8 @@ import { MdEdit, MdOutlineDone } from "react-icons/md";
 
 import { createTournament, getTournaments, deleteTournament, addPlayer, deletePlayer, addExistingPlayer, getPlayersByTournament, getAllPlayers, updateTournamentByeValue, updateSelectedTournament, updateTournamentStarted, updateTournaments, updateAllTournaments } from '@/components/fileOperations'
 
+import Modal from '@/components/modal';
+
 import { BsTrash } from "react-icons/bs"
 
 import { FaTrophy } from "react-icons/fa6";
@@ -20,24 +22,30 @@ import { generarEmparejamientosSuizos } from '@/components/pairings'
 
 import { ToastContainer } from "react-toastify"
 
-import { AddPlayerToast } from '@/components/toasts'
-
 
 function formatFullname(nombre, apellido) {
   if (!nombre || !apellido) {
-    return "Nombre y apellido son obligatorios."
+    return "Nombre y apellido son obligatorios.";
   }
 
-  const nombreFormateado = nombre
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
+  const formatWord = (word) => {
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  };
 
-  const apellidoFormateado = apellido.charAt(0).toUpperCase() + apellido.slice(1).toLowerCase()
+  const formatMultipleWords = (words) => {
+    return words.split(' ').map(formatWord).join(' ');
+  };
 
-  const nombreCompletoFormateado = `${nombreFormateado} ${apellidoFormateado}`
+  const formatMultipleLastnames = (lastnames) => {
+    return lastnames.split(' ').map(formatWord).join(' ');
+  };
 
-  return nombreCompletoFormateado
+  const nombreFormateado = formatMultipleWords(nombre);
+  const apellidoFormateado = formatMultipleLastnames(apellido);
+
+  const nombreCompletoFormateado = `${nombreFormateado} ${apellidoFormateado}`;
+
+  return nombreCompletoFormateado;
 }
 
 const Torneos = () => {
@@ -77,8 +85,14 @@ const Torneos = () => {
   const [updatePlayers, setUpdatePlayers] = useState(false)
 
 
-const [isEditing, setIsEditing] = useState(false);
-const [editedName, setEditedName] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState('');
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
 
   /* FUNCTIONS */
 
@@ -194,20 +208,7 @@ const [editedName, setEditedName] = useState('');
     updateTournamentByeValue(selectedTournament, bye)
   }, [bye, rounds])
 
-  const handleEditClick = (player) => {
-    setIsEditing(true);
-    setEditedName(player.name); // Set the current name to the editedName state
-  };
 
-  const handleAcceptClick = () => {
-    setIsEditing(false);
-    // Perform any logic you need to update the player name (e.g., API call)
-    // Once the update is successful, you can update the local state or refetch the data.
-  };
-
-  const handleInputChange = (e) => {
-    setEditedName(e.target.value);
-  };
   return (
     <div className='tournaments'>
       <div className='tournamentsContainer'>
@@ -247,6 +248,7 @@ const [editedName, setEditedName] = useState('');
           })}
         </div>
       </div>
+      
       <div className={Object.keys(selectedTournament).length !== 0 ? 'playersContainer' : 'd-none'}>
         <div className='tournamentDetails' >
           <div className={selectedTournament.finished ? 'd-none' : 'addPlayerContainer'}>
@@ -274,6 +276,7 @@ const [editedName, setEditedName] = useState('');
               ref={inputRefs[2]}
               onKeyDown={(event) => manejarKeyDown(event, 2)}>Agregar</button>
           </div>
+          
           <div className={selectedTournament.finished ? 'd-none' : 'tournamentDetailsInfo'}>
             <div>
               <div>
@@ -373,63 +376,48 @@ const [editedName, setEditedName] = useState('');
           <div className='playersResults'>
             <h3>Jugadores del torneo:&nbsp;<span className='tournamentName'>{selectedTournament.name}</span><span className='armozaElo'>ELO<i>Armoza</i></span><span>{selectedTournament && selectedTournament.players && players && players.length}</span></h3>
             <div>{players &&
-        Object.keys(selectedTournament).length !== 0 &&
-        players
-          .filter((player) => player.name !== 'BYE')
-          .reverse()
-          .map((player, index) => (
-            <p
-              onClick={() => {
-                selectedTournament && !selectedTournament.finished
-                  ? setSelectedPlayer(player)
-                  : '';
-              }}
-              className={selectedPlayer.id === player.id ? 'selectedPlayer' : ''}
-              key={index + 1}
-            >
-              <span>
-                {isEditing ? (
-                  <input
-                    value={editedName}
-                    onChange={handleInputChange}
-                    className='editable-input'
-                  />
-                ) : (
-                  player.name
-                )}
-                {isEditing ? (
-                  <MdOutlineDone onClick={handleAcceptClick} className={
-                    selectedPlayer.id !== player.id || selectedTournament.finished
-                      ? 'd-none confirmPlayerName'
-                      : 'confirmPlayerName'
-                  }/>
-                ) : (
-                  <MdEdit onClick={() => handleEditClick(player)} className={
-                    selectedPlayer.id !== player.id || selectedTournament.finished
-                      ? 'd-none editPlayerName'
-                      : 'editPlayerName'
-                  } />
-                )}
-              </span>
-
-              <span className='playerElo'>
-                {player.elo}
-                {player.games < 6 ? '?' : ''}
-              </span>
-              <span
-                className={
-                  selectedPlayer.id !== player.id || selectedTournament.finished
-                    ? 'd-none deleteTournamentButton'
-                    : 'deleteTournamentButton'
-                }
-                onClick={() => {
-                  setUpdatePlayers((prev) => !prev);
-                }}
-              >
-                <BsTrash className='trashIcon' />
-              </span>
-            </p>
-          ))}
+              Object.keys(selectedTournament).length !== 0 &&
+              players
+                .filter((player) => player.name !== 'BYE')
+                .reverse()
+                .map((player, index) => (
+                  <p
+                    onClick={() => {
+                      selectedTournament && !selectedTournament.finished
+                        ? setSelectedPlayer(player)
+                        : '';
+                    }}
+                    className={selectedPlayer.id === player.id ? 'selectedPlayer' : ''}
+                    key={index + 1}
+                  >
+                    <span>
+                      {formatFullname(player.name, player.surname)}
+                      <MdEdit onClick={handleShow} className={
+                          selectedPlayer.id !== player.id || selectedTournament.finished
+                            ? 'd-none editPlayerName'
+                            : 'editPlayerName '
+                        }
+                    />
+                    </span>
+                    <span className='playerElo'>
+                      {player.elo}
+                      {player.games < 6 ? '?' : ''}
+                    </span>
+                    <span
+                      className={
+                        selectedPlayer.id !== player.id || selectedTournament.finished
+                          ? 'd-none deleteTournamentButton'
+                          : 'deleteTournamentButton'
+                      }
+                      onClick={() => {
+                        deletePlayerFromList(player)
+                        setUpdatePlayers(!updatePlayers)
+                      }}
+                    >
+                      <BsTrash className='trashIcon' />
+                    </span>
+                  </p>
+                ))}
             </div>
           </div>
           <div className={selectedTournament.finished ? 'd-none playersResultsFastAdd' : 'playersResultsFastAdd'}>
@@ -464,16 +452,16 @@ const [editedName, setEditedName] = useState('');
                     .sort((a, b) => b.points - a.points)
                     .map((player, index) => (
                       <li className='finalResultsLi' key={index}>
-                        <span>{index + 1}.{`   ${player.name} ${player.surname}`}{index === 0 ? <FaTrophy className='firstPlaceTrophy' /> : index === 1 ? <FaTrophy className='secondPlaceTrophy' /> : index === 2 ? <FaTrophy className='thirdPlaceTrophy' />  : ''}</span>
+                        <span>{index + 1}.{`   ${player.name} ${player.surname}`}{index === 0 ? <FaTrophy className='firstPlaceTrophy' /> : index === 1 ? <FaTrophy className='secondPlaceTrophy' /> : index === 2 ? <FaTrophy className='thirdPlaceTrophy' /> : ''}</span>
                         <span className='playerEloFinalResults'>{player.elo}{player.games < 6 ? '?' : ''}</span><span>{player.points}</span>
                       </li>
                     ))}
               </ul>
-
             </div>
           </div>
         </div>
       </div>
+      <Modal handleClose={handleClose} show={show} />
       <ToastContainer
         position="top-right"
         autoClose={2000}
